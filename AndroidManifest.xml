@@ -17,8 +17,9 @@
     android:glEsVersion="0x00020000"
     android:required="true"/>
  
+ <!--android:icon="@drawable/ic_launcher"-->
   <application
-    android:icon="@drawable/ic_launcher"
+    
     android:label="Place-Its Demo"
     android:hardwareAccelerated="true">
     <meta-data android:name="com.google.android.maps.v2.API_KEY"
