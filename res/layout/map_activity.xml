@@ -4,6 +4,19 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Search for location" 
+        android:imeOptions="actionSearch"
+        android:inputType="text" >
+
+        <requestFocus />
+    </EditText>
+
   <fragment
       android:id="@+id/map"
       android:layout_width="match_parent"
