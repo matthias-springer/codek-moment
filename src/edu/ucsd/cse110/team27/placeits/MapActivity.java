@@ -6,6 +6,8 @@ import java.util.List;
 
 import edu.ucsd.cse110.team27.placeits.R;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.FileManager;
+import edu.ucsd.cse110.team27.placeits.data.PlaceItType;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -45,6 +47,8 @@ public class MapActivity extends FragmentActivity
 
     private LocationClient mLocationClient;
     
+    private FileManager fileManager;
+    
     private static final LocationRequest REQUEST = LocationRequest.create()
             .setInterval(1000)         // 1s
             .setFastestInterval(16)    // 60fps
@@ -56,6 +60,16 @@ public class MapActivity extends FragmentActivity
         setContentView(R.layout.map_activity);
         
         setupCallbacks();
+        
+        fileManager = new FileManager(getApplicationContext());
+        /* Mattias - fileManager.loadPlaceIts returns a list of all active placeits in persistent memory
+         *  - please link this to your data structure somehow
+         * try {
+         
+			fileManager.loadPlaceits(PlaceItType.ACTIVE);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
     }
 
     private void setupCallbacks() {
@@ -179,6 +193,13 @@ public class MapActivity extends FragmentActivity
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+    }
+    
+    @Override
+    public void onStop() {
+    	/* Mattias - please this takes in a List of placeits and writes them to persistent storage,
+    		- please link this to your data structures
+    	fileManager.savePlaceits(PlaceItList, PlaceItType.ACTIVE)*/
     }
 
 }
