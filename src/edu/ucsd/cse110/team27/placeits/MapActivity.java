@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.ucsd.cse110.team27.placeits.R;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -16,6 +17,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -28,8 +30,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
@@ -50,6 +56,8 @@ public class MapActivity extends FragmentActivity
             .setFastestInterval(16)    // 60fps
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+    private LatLng lastLocation;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +129,37 @@ public class MapActivity extends FragmentActivity
 			}
 			
         });
+        
+        final EditText placeItTitle = (EditText) findViewById(R.id.placeItTitle);
+        final EditText placeItDescription = (EditText) findViewById(R.id.placeItDescription);
+        
+        final Button cancelCreateButton = (Button) findViewById(R.id.cancelCreateButton);
+        cancelCreateButton.setOnClickListener(new OnClickListener() {
+        	
+			@Override
+			public void onClick(View arg0) {
+				hideCreatePlaceItLayout();
+			}
+		});
+        
+        final Button createButton = (Button) findViewById(R.id.createPlaceItButton);
+        createButton.setOnClickListener(new OnClickListener() {
+        	
+			@Override
+			public void onClick(View arg0) {
+				hideCreatePlaceItLayout();
+				
+				ActivePlaceIts.getInstance(MapActivity.this).add(new PlaceIt(
+						placeItTitle.getText().toString(),
+						placeItDescription.getText().toString(),
+						lastLocation));
+			}
+		});
+    }
+    
+    private void hideCreatePlaceItLayout() {
+		LinearLayout createPlaceItLayout = (LinearLayout) findViewById(R.id.createPlaceItLayout);
+		createPlaceItLayout.setVisibility(View.GONE);
     }
     
     @Override
@@ -138,7 +177,7 @@ public class MapActivity extends FragmentActivity
             mLocationClient.disconnect();
         }
     }
-
+    
     private void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
@@ -146,6 +185,16 @@ public class MapActivity extends FragmentActivity
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
             }
+            
+            mMap.setOnMapClickListener(new OnMapClickListener() {
+    			
+    			@Override
+    			public void onMapClick(LatLng latLng) {
+    				lastLocation = latLng;
+    				LinearLayout createPlaceItLayout = (LinearLayout) findViewById(R.id.createPlaceItLayout);
+    				createPlaceItLayout.setVisibility(View.VISIBLE);
+    			}
+    		});
         }
     }
 
@@ -181,4 +230,10 @@ public class MapActivity extends FragmentActivity
     public void onConnectionFailed(ConnectionResult result) {
     }
 
+    public void addPlaceIt(PlaceIt placeIt) {
+    	// TODO: think about this
+		Marker marker = mMap.addMarker(new MarkerOptions()
+			.title(placeIt.getTitle())
+			.position(placeIt.getLocation()));
+    }
 }

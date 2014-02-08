@@ -20,16 +20,16 @@
  <!--android:icon="@drawable/ic_launcher"-->
   <application
     
-    android:label="Place-Its Demo"
+    android:label="Place-Its"
     android:hardwareAccelerated="true">
     <meta-data android:name="com.google.android.maps.v2.API_KEY"
-    android:value="AIzaSyDQtSXdNnobfNtVCMPOoIRk20Zx-QerTuY"/>
+    	android:value="AIzaSyDi_rLuvZi67byW2Ioo5aha3jsYIrLidAI"/>
     <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
     <activity
       android:name="edu.ucsd.cse110.team27.placeits.MapActivity"
-      android:label="Place-Its Demo">
+      android:label="Place-Its">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>

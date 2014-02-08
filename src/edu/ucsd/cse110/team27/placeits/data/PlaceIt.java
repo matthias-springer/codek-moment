@@ -1,6 +1,6 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
-import android.location.Location;
+import com.google.android.gms.maps.model.LatLng;
 
 public class PlaceIt {
 
@@ -8,11 +8,11 @@ public class PlaceIt {
 	
 	private String description;
 	
-	private Location location;
+	private LatLng location;
 	
 	// TODO: expiration date, recurring time
 	
-	public PlaceIt(String title, String description, Location location) {
+	public PlaceIt(String title, String description, LatLng location) {
 		this.setTitle(title);
 		this.setDescription(description);
 		this.setLocation(location);
@@ -34,16 +34,17 @@ public class PlaceIt {
 		this.description = description;
 	}
 
-	public Location getLocation() {
+	public LatLng getLocation() {
 		return location;
 	}
-
-	public void setLocation(Location location) {
+	
+	public void setLocation(LatLng location) {
 		this.location = location;
 	}
 	
+	/*
 	public float distanceTo(Location location) {
 		return this.location.distanceTo(location);
 	}
-	
+	*/
 }
