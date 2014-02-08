@@ -13,7 +13,6 @@
         android:imeOptions="actionSearch"
         android:inputType="text" >
 
-        <requestFocus />
     </EditText>
 
     <LinearLayout
