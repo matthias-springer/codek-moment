@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class PlaceIt {
 
@@ -9,6 +10,8 @@ public class PlaceIt {
 	private String description;
 	
 	private LatLng location;
+	
+	private Marker marker;
 	
 	// TODO: expiration date, recurring time
 	
@@ -40,6 +43,14 @@ public class PlaceIt {
 	
 	public void setLocation(LatLng location) {
 		this.location = location;
+	}
+
+	public Marker getMarker() {
+		return marker;
+	}
+
+	public void setMarker(Marker marker) {
+		this.marker = marker;
 	}
 	
 	/*

@@ -21,4 +21,9 @@ public class PulledDownPlaceIts extends PlaceIts {
 		return instance;
 	}
 	
+	@Override
+	protected String getFileName() {
+		return "PULLED_DOWN_PLACE_ITS";
+	}
+	
 }

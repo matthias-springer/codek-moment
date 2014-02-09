@@ -26,4 +26,15 @@ public class ActivePlaceIts extends PlaceIts {
 		super.add(placeIt);
 		activity.addPlaceIt(placeIt);
 	}
+	
+	@Override 
+	public void remove(PlaceIt placeIt) {
+		super.remove(placeIt);
+		activity.removePlaceIt(placeIt);
+	}
+	
+	@Override
+	protected String getFileName() {
+		return "ACTIVE_PLACE_ITS";
+	}
 }
