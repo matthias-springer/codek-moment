@@ -36,9 +36,11 @@ public abstract class PlaceIts {
 	}
 
 	public void removeAll() {
-		for (PlaceIt placeIt : placeIts) {
-			remove(placeIt);
-		}
+		placeIts.clear();
+	}
+	
+	public PlaceIt[] toArray() {
+		return placeIts.toArray(new PlaceIt[placeIts.size()]);
 	}
 
 	public PlaceIts(MapActivity activity) {
@@ -57,11 +59,12 @@ public abstract class PlaceIts {
 					+ placeit.getLocation().longitude + NL;
 			fileOut.write(placeItData);
 		}
-
+		
 		fileOut.close();
 	}
 
 	public void load() throws IOException {
+		removeAll();
 		try {
 			BufferedReader fileIn = new BufferedReader(new InputStreamReader(
 					appContext.openFileInput(getFileName())));

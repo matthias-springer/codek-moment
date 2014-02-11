@@ -53,6 +53,10 @@ public class PlaceIt {
 		this.marker = marker;
 	}
 	
+	@Override
+	public String toString() {
+		return title;
+	}
 	/*
 	public float distanceTo(Location location) {
 		return this.location.distanceTo(location);

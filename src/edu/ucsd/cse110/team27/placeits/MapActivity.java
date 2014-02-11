@@ -32,6 +32,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -41,6 +44,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.app.ActionBar;
+import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
@@ -221,6 +226,7 @@ public class MapActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
+		
 	}
 
 	private void loadPlaceIts() {
@@ -316,4 +322,23 @@ public class MapActivity extends FragmentActivity implements
 		placeIt.setMarker(null);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.map_activity_actions, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case R.id.action_placeit_list:
+				Intent intent = new Intent(this, PlaceItsList.class);
+				startActivity(intent);
+				break;
+		}
+		
+		return true;
+	}
 }
