@@ -56,6 +56,9 @@ public class MapActivity extends FragmentActivity implements
 
 	private UIHandlers uiHandlers;
 	
+	//Used as a key for accessing data in intents that switch activities
+	public final static String MESSAGE_KEY = "com.ucsd.cse110.team27.placeits.MESSAGE";
+	
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(1000) // 1s
 			.setFastestInterval(16) // 60fps
@@ -332,9 +335,16 @@ public class MapActivity extends FragmentActivity implements
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
 		switch(item.getItemId()) {
-			case R.id.action_placeit_list:
-				Intent intent = new Intent(this, PlaceItsList.class);
+			case R.id.dropDownActiveList:
+				intent = new Intent(this, PlaceItsList.class);
+				intent.putExtra(MESSAGE_KEY, 0);
+				startActivity(intent);
+				break;
+			case R.id.dropDownPulledList:
+				intent = new Intent(this, PlaceItsList.class);
+				intent.putExtra(MESSAGE_KEY, 1);
 				startActivity(intent);
 				break;
 		}

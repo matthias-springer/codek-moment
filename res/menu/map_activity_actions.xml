@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_placeit_list"
+          android:icon="@drawable/ic_action_view_as_list"
+          android:showAsAction="ifRoom|withText"
+          android:title="PlaceIts Lists" >
+          <menu>
+          	<item
+          		android:id="@+id/dropDownActiveList"
+          		android:title="Active PlaceIts" />
+          	<item
+          		android:id="@+id/dropDownPulledList"
+          		android:title="Pulled Down PlaceIts" />
+          </menu>
+    </item>
+</menu>
