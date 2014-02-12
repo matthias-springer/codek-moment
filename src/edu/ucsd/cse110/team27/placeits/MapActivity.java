@@ -294,8 +294,7 @@ public class MapActivity extends FragmentActivity implements
 					.title(placeIt.getTitle())
 					.position(placeIt.getLocation())
 					.snippet(placeIt.getDescription())
-					.icon(BitmapDescriptorFactory
-							.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+					.icon(BitmapDescriptorFactory.fromResource(getResources().getIdentifier("posticon", "drawable", getPackageName()))));
 
 			placeIt.setMarker(marker);
 		} catch (Exception exc) {
