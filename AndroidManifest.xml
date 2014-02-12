@@ -48,6 +48,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.ucsd.cse110.team27.placeits.MapActivity" />
         </activity>
+        <activity
+            android:name="edu.ucsd.cse110.team27.placeits.PlaceItDetails"
+            android:label="Place It Details"
+            android:parentActivityName="edu.ucsd.cse110.team27.placeits.PlaceItsList" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.ucsd.cse110.team27.placeits.PlaceItsList" />
+        </activity>
     </application>
 
 </manifest>

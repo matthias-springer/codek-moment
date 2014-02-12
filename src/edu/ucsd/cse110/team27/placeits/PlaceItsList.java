@@ -5,8 +5,12 @@ import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v4.app.NavUtils;
@@ -14,6 +18,7 @@ import android.support.v4.app.NavUtils;
 public class PlaceItsList extends Activity {
 
 	private ArrayAdapter<PlaceIt> adapter;
+	private int placeItListType;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,24 +27,45 @@ public class PlaceItsList extends Activity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
-		ListView activeList = (ListView) findViewById(R.id.placeits_list);
-		switch(getIntent().getIntExtra(MapActivity.MESSAGE_KEY, -1)) {
-			case 0:
+		ListView placeitList = (ListView) findViewById(R.id.placeits_list);
+		switch(getIntent().getIntExtra(PlaceIt.PLACEIT_TYPE_KEY, -1)) {
+			case PlaceIt.PLACE_IT_ACTIVE:
 				adapter = new ArrayAdapter<PlaceIt>(this,
 		                android.R.layout.simple_list_item_1, 
 		                (PlaceIt[]) ActivePlaceIts.getInstance(null).toArray());
+				placeItListType = PlaceIt.PLACE_IT_ACTIVE;
 				setTitle("Active PlaceIts");
 				break;
-			case 1:
+			case PlaceIt.PLACE_IT_PULLED:
 				adapter = new ArrayAdapter<PlaceIt>(this,
 		                android.R.layout.simple_list_item_1, 
 		                (PlaceIt[]) PulledDownPlaceIts.getInstance(null).toArray());
+				placeItListType = PlaceIt.PLACE_IT_PULLED;
 				setTitle("Pulled Down PlaceIts");
-				break;			
+				break;	
+			default:
+				adapter = new ArrayAdapter<PlaceIt>(this,
+		                android.R.layout.simple_list_item_1, 
+		                (PlaceIt[]) ActivePlaceIts.getInstance(null).toArray());
+				placeItListType = PlaceIt.PLACE_IT_ACTIVE;
+				setTitle("Active PlaceIts");
+				break;
 		}
 		
-		
-		activeList.setAdapter(adapter);
+		placeitList.setAdapter(adapter);
+		placeitList.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				Intent intent = new Intent(getApplicationContext(), PlaceItDetails.class);
+				
+				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, placeItListType);
+				intent.putExtra(PlaceIt.PLACEIT_POS_KEY, position);
+				startActivity(intent);
+			}
+			
+		});
 	}
 	
 	/**

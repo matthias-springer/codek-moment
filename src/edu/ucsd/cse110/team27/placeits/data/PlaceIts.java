@@ -1,7 +1,6 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -29,10 +28,12 @@ public abstract class PlaceIts {
 
 	public void add(PlaceIt placeIt) {
 		placeIts.add(placeIt);
+		save();
 	}
 
 	public void remove(PlaceIt placeIt) {
 		placeIts.remove(placeIt);
+		save();
 	}
 
 	public void removeAll() {
@@ -42,28 +43,40 @@ public abstract class PlaceIts {
 	public PlaceIt[] toArray() {
 		return placeIts.toArray(new PlaceIt[placeIts.size()]);
 	}
+	
+	public boolean contains(PlaceIt placeit) {
+		return placeIts.contains(placeit);
+	}
+	
+	public PlaceIt getAtPosition(int pos) {
+		return placeIts.get(pos);
+	}
 
 	public PlaceIts(MapActivity activity) {
 		this.activity = activity;
 		this.appContext = activity.getApplicationContext();
 	}
 
-	public void save() throws IOException {
-		OutputStreamWriter fileOut = new OutputStreamWriter(
-				appContext.openFileOutput(getFileName(), Context.MODE_PRIVATE));
-
-		for (PlaceIt placeit : placeIts) {
-			String placeItData = placeit.getTitle() + DELIM
-					+ placeit.getDescription() + DELIM
-					+ placeit.getLocation().latitude + DELIM
-					+ placeit.getLocation().longitude + NL;
-			fileOut.write(placeItData);
+	public void save() {
+		try {
+			OutputStreamWriter fileOut = new OutputStreamWriter(
+					appContext.openFileOutput(getFileName(), Context.MODE_PRIVATE));
+	
+			for (PlaceIt placeit : placeIts) {
+				String placeItData = placeit.getTitle() + DELIM
+						+ placeit.getDescription() + DELIM
+						+ placeit.getLocation().latitude + DELIM
+						+ placeit.getLocation().longitude + NL;
+				fileOut.write(placeItData);
+			}
+			
+			fileOut.close();
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
-		
-		fileOut.close();
 	}
 
-	public void load() throws IOException {
+	public void load(){
 		removeAll();
 		try {
 			BufferedReader fileIn = new BufferedReader(new InputStreamReader(
@@ -79,7 +92,7 @@ public abstract class PlaceIts {
 			}
 
 			fileIn.close();
-		} catch (FileNotFoundException ex) {
+		} catch (IOException ex) {
 			// No Place-Its file found, probably starting for the first time
 		}
 	}

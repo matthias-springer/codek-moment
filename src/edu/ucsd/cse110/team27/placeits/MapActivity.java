@@ -44,7 +44,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
-import android.app.ActionBar;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
@@ -55,9 +54,6 @@ public class MapActivity extends FragmentActivity implements
 	private LocationClient mLocationClient;
 
 	private UIHandlers uiHandlers;
-	
-	//Used as a key for accessing data in intents that switch activities
-	public final static String MESSAGE_KEY = "com.ucsd.cse110.team27.placeits.MESSAGE";
 	
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(1000) // 1s
@@ -233,14 +229,8 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	private void loadPlaceIts() {
-		try {
-			ActivePlaceIts.getInstance(this).load();
-			PulledDownPlaceIts.getInstance(this).load();
-		} catch (IOException e) {
-			// TODO: error handling
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		ActivePlaceIts.getInstance(this).load();
+		PulledDownPlaceIts.getInstance(this).load();
 	}
 	
 	@Override
@@ -294,14 +284,8 @@ public class MapActivity extends FragmentActivity implements
 	public void onStop() {
 		super.onStop();
 
-		try {
-			ActivePlaceIts.getInstance(this).save();
-			PulledDownPlaceIts.getInstance(this).save();
-		} catch (IOException e) {
-			// TODO: error handling
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		ActivePlaceIts.getInstance(this).save();
+		PulledDownPlaceIts.getInstance(this).save();
 	}
 
 	public void addPlaceIt(PlaceIt placeIt) {
@@ -339,12 +323,12 @@ public class MapActivity extends FragmentActivity implements
 		switch(item.getItemId()) {
 			case R.id.dropDownActiveList:
 				intent = new Intent(this, PlaceItsList.class);
-				intent.putExtra(MESSAGE_KEY, 0);
+				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_ACTIVE);
 				startActivity(intent);
 				break;
 			case R.id.dropDownPulledList:
 				intent = new Intent(this, PlaceItsList.class);
-				intent.putExtra(MESSAGE_KEY, 1);
+				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
 				startActivity(intent);
 				break;
 		}

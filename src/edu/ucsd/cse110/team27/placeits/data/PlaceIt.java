@@ -13,6 +13,13 @@ public class PlaceIt {
 	
 	private Marker marker;
 	
+	public static final int PLACE_IT_ACTIVE = 0;
+	
+	public static final int PLACE_IT_PULLED = 1;
+	
+	public static final String PLACEIT_TYPE_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_TYPE";
+	public static final String PLACEIT_POS_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_POS";
+	
 	// TODO: expiration date, recurring time
 	
 	public PlaceIt(String title, String description, LatLng location) {
@@ -53,6 +60,16 @@ public class PlaceIt {
 		this.marker = marker;
 	}
 	
+	public int getType() {
+		if(ActivePlaceIts.getInstance(null).contains(this)) {
+			return PLACE_IT_ACTIVE;
+		} else if (PulledDownPlaceIts.getInstance(null).contains(this)) {
+			return PLACE_IT_PULLED;
+		} else {
+			return -1;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return title;
@@ -62,4 +79,5 @@ public class PlaceIt {
 		return this.location.distanceTo(location);
 	}
 	*/
+
 }
