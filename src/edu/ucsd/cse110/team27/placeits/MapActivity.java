@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
@@ -228,6 +230,7 @@ public class MapActivity extends FragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
 		
@@ -343,32 +346,5 @@ public class MapActivity extends FragmentActivity implements
 		
 		return true;
 	}
-	
-    private void printNotification(int noteID, String title, String text) {
-    	Uri noteSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-    	NotificationCompat.Builder note = 
-    			new NotificationCompat.Builder(this)
-    	        .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
-    	        .setContentTitle(title)
-    	        .setContentText(text)
-    	        .setSound(noteSound)
-    	        .setAutoCancel(true);
-    	int notificationID = noteID;
-    	
-    	Intent resInt = new Intent(this, MapActivity.class);
-    	resInt.setFlags(268435456 | 32768);
-    	PendingIntent resPendInt = PendingIntent.getActivity(
-    			                   this,
-    			                   0,
-    			                   resInt,
-    			                   PendingIntent.FLAG_UPDATE_CURRENT);
-    	note.setContentIntent(resPendInt);
 
-
-    	
-    	NotificationManager notifyMgr = 
-    	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-    	notifyMgr.notify(notificationID, note.build());
-
-    } 
 }
