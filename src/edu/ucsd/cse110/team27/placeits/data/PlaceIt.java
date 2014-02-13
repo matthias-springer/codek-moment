@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
+import java.util.Random;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -12,6 +14,10 @@ public class PlaceIt {
 	private LatLng location;
 	
 	private Marker marker;
+	
+	private boolean print;
+	
+	private int ID; 
 	
 	public static final int PLACE_IT_ACTIVE = 0;
 	
@@ -27,7 +33,23 @@ public class PlaceIt {
 		this.setDescription(description);
 		this.setLocation(location);
 	}
-
+	
+	public int getID() {
+		return this.ID;
+	}
+	
+	public void setID(int id) {
+		this.ID = id; 
+	}
+	
+	public boolean getPrint() {
+		return this.print;
+	}
+	
+	public void setPrint(boolean bool) {
+		this.print = bool;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

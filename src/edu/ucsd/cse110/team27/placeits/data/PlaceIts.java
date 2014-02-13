@@ -25,6 +25,10 @@ public abstract class PlaceIts {
 	protected MapActivity activity;
 
 	protected abstract String getFileName();
+	
+	public List<PlaceIt> getList() {
+		return this.placeIts;
+	}
 
 	public void add(PlaceIt placeIt) {
 		placeIts.add(placeIt);
@@ -56,6 +60,8 @@ public abstract class PlaceIts {
 		this.activity = activity;
 		this.appContext = activity.getApplicationContext();
 	}
+	
+	
 
 	public void save() {
 		try {
@@ -96,4 +102,9 @@ public abstract class PlaceIts {
 			// No Place-Its file found, probably starting for the first time
 		}
 	}
+
+	public int getPosition(PlaceIt placeit) {
+		return placeIts.indexOf(placeit);
+	}
 }
+

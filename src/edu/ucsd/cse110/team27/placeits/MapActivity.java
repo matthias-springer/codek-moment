@@ -29,8 +29,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +47,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
@@ -226,6 +231,7 @@ public class MapActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
 		
+		
 	}
 
 	private void loadPlaceIts() {
@@ -240,6 +246,9 @@ public class MapActivity extends FragmentActivity implements
 		getUIHandlers().setUpCallbacks();
 		setUpLocationClientIfNeeded();
 		mLocationClient.connect();
+		
+		ActivePlaceIts.getInstance(this);
+		startService(new Intent(this, distanceService.class));
 	}
 
 	@Override
@@ -334,4 +343,32 @@ public class MapActivity extends FragmentActivity implements
 		
 		return true;
 	}
+	
+    private void printNotification(int noteID, String title, String text) {
+    	Uri noteSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+    	NotificationCompat.Builder note = 
+    			new NotificationCompat.Builder(this)
+    	        .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
+    	        .setContentTitle(title)
+    	        .setContentText(text)
+    	        .setSound(noteSound)
+    	        .setAutoCancel(true);
+    	int notificationID = noteID;
+    	
+    	Intent resInt = new Intent(this, MapActivity.class);
+    	resInt.setFlags(268435456 | 32768);
+    	PendingIntent resPendInt = PendingIntent.getActivity(
+    			                   this,
+    			                   0,
+    			                   resInt,
+    			                   PendingIntent.FLAG_UPDATE_CURRENT);
+    	note.setContentIntent(resPendInt);
+
+
+    	
+    	NotificationManager notifyMgr = 
+    	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    	notifyMgr.notify(notificationID, note.build());
+
+    } 
 }

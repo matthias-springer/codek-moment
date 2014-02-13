@@ -26,14 +26,17 @@
         android:theme="@android:style/Theme.Holo.Light" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCr_XODXSoCv0uiiO7BmxZ3EUKo7b3AsgQ" />
+            android:value="AIzaSyATHxT8HdZqr8FWrUkn5g_eQpL2000kW58" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name="edu.ucsd.cse110.team27.placeits.MapActivity"
-            android:label="Place-Its" >
+	    <activity
+	   	 android:name="edu.ucsd.cse110.team27.placeits.MapActivity"
+	     android:label="Place-Its"
+     	 android:launchMode="singleTask"
+     	 android:taskAffinity=""
+     	 android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,6 +59,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.ucsd.cse110.team27.placeits.PlaceItsList" />
         </activity>
+        <service android:enabled="true" android:name=".distanceService" />
     </application>
 
 </manifest>
