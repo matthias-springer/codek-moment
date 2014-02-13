@@ -14,48 +14,26 @@ import android.content.Context;
 
 import edu.ucsd.cse110.team27.placeits.MapActivity;
 
-public abstract class PlaceIts {
-
-	private static final String DELIM = "~◙;◙~";
-	private static final String NL = System.getProperty("line.separator");
+public abstract class PlaceIts<T extends PlaceIt> {
 	
-	private Context appContext;
+	protected Context appContext;
 
-	protected List<PlaceIt> placeIts = new ArrayList<PlaceIt>();
+	protected List<T> placeIts = new ArrayList<T>();
 
 	protected MapActivity activity;
 
+	private static final String NL = System.getProperty("line.separator");
+	
 	protected abstract String getFileName();
-
-	public void add(PlaceIt placeIt) {
-		placeIts.add(placeIt);
-	}
-
-	public void remove(PlaceIt placeIt) {
-		placeIts.remove(placeIt);
-	}
-
-	public void removeAll() {
-		for (PlaceIt placeIt : placeIts) {
-			remove(placeIt);
-		}
-	}
-
-	public PlaceIts(MapActivity activity) {
-		this.activity = activity;
-		this.appContext = activity.getApplicationContext();
-	}
-
+	
+	protected abstract PlaceIt newInstance();
+	
 	public void save() throws IOException {
 		OutputStreamWriter fileOut = new OutputStreamWriter(
 				appContext.openFileOutput(getFileName(), Context.MODE_PRIVATE));
 
 		for (PlaceIt placeit : placeIts) {
-			String placeItData = placeit.getTitle() + DELIM
-					+ placeit.getDescription() + DELIM
-					+ placeit.getLocation().latitude + DELIM
-					+ placeit.getLocation().longitude + NL;
-			fileOut.write(placeItData);
+			fileOut.write(placeit.toString() + NL);
 		}
 
 		fileOut.close();
@@ -68,16 +46,39 @@ public abstract class PlaceIts {
 
 			String line = "";
 			while ((line = fileIn.readLine()) != null) {
-				String[] placeitData = line.split(DELIM);
-				LatLng location = new LatLng(
-						Double.parseDouble(placeitData[2]),
-						Double.parseDouble(placeitData[3]));
-				add(new PlaceIt(placeitData[0], placeitData[1], location));
+				add((T) newInstance().load(line));
 			}
 
 			fileIn.close();
 		} catch (FileNotFoundException ex) {
 			// No Place-Its file found, probably starting for the first time
+		}
+	}
+	
+	public void add(T placeIt) {
+		placeIts.add(placeIt);
+	}
+
+	public void remove(T placeIt) {
+		placeIts.remove(placeIt);
+	}
+
+	public void removeAll() {
+		clear();
+	}
+
+	public PlaceIts(MapActivity activity) {
+		this.activity = activity;
+		this.appContext = activity.getApplicationContext();
+	}
+	
+	public boolean contains(Object o) {
+		return placeIts.contains(o);
+	}
+
+	public void clear() {
+		while (!placeIts.isEmpty()) {
+			remove(placeIts.get(0));
 		}
 	}
 }

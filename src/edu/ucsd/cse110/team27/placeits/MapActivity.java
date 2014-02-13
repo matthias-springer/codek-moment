@@ -7,6 +7,9 @@ import java.util.List;
 import edu.ucsd.cse110.team27.placeits.R;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
+import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
+import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype.RepeatMode;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -35,9 +39,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
@@ -50,22 +59,23 @@ public class MapActivity extends FragmentActivity implements
 	private LocationClient mLocationClient;
 
 	private UIHandlers uiHandlers;
-	
+
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(1000) // 1s
 			.setFastestInterval(16) // 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 	private UIHandlers getUIHandlers() {
-		// NOTE: cannot move Singleton creation to the class itself due to Java syntax restrictions
-		
+		// NOTE: cannot move Singleton creation to the class itself due to Java
+		// syntax restrictions
+
 		if (uiHandlers == null) {
 			uiHandlers = new UIHandlers();
 		}
-		
+
 		return uiHandlers;
 	}
-	
+
 	private class UIHandlers {
 		private final EditText placeItTitle;
 		private final EditText placeItDescription;
@@ -74,6 +84,18 @@ public class MapActivity extends FragmentActivity implements
 		private final Button createButton;
 		private final LinearLayout createPlaceItLayout;
 
+		private final CheckBox checkRepeating;
+		private final LinearLayout repeatingBox;
+		private final RadioButton optionRepeatDayWeek;
+		private final RadioButton optionRepeatMinutes;
+		private final LinearLayout dayWeekBox;
+		private final LinearLayout minutesBox;
+		private final EditText textRepeatWeeks;
+		private final Spinner spinnerRepeatDay;
+		private final EditText textRepeatMinutes;
+
+		private final Button debugClear;
+		
 		private LatLng lastLocation;
 
 		public UIHandlers() {
@@ -83,12 +105,67 @@ public class MapActivity extends FragmentActivity implements
 			searchBox = (EditText) findViewById(R.id.location);
 			createButton = (Button) findViewById(R.id.createPlaceItButton);
 			createPlaceItLayout = (LinearLayout) findViewById(R.id.createPlaceItLayout);
+
+			checkRepeating = (CheckBox) findViewById(R.id.checkRepeating);
+			repeatingBox = (LinearLayout) findViewById(R.id.repeatingBox);
+			optionRepeatDayWeek = (RadioButton) findViewById(R.id.optionRepeatDayWeek);
+			optionRepeatMinutes = (RadioButton) findViewById(R.id.optionRepeatMinute);
+			dayWeekBox = (LinearLayout) findViewById(R.id.repeatDayWeekBox);
+			minutesBox = (LinearLayout) findViewById(R.id.repeatMinutesBox);
+			textRepeatWeeks = (EditText) findViewById(R.id.repeatWeeks);
+			spinnerRepeatDay = (Spinner) findViewById(R.id.repeatDay);
+			textRepeatMinutes = (EditText) findViewById(R.id.repeatMinutes);
+			
+			debugClear = (Button) findViewById(R.id.debugClear);
 		}
 
 		public void setUpCallbacks() {
 			setUpMapIfNeeded();
 			setUpSearchBoxHandler();
 			setUpCreatePlaceItButtons();
+			setUpRepeatingBox();
+		}
+
+		private void setUpRepeatingBox() {
+			checkRepeating
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView,
+								boolean isChecked) {
+							repeatingBox.setVisibility(isChecked ? View.VISIBLE
+									: View.GONE);
+						}
+					});
+
+			optionRepeatDayWeek
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView,
+								boolean isChecked) {
+							dayWeekBox.setVisibility(isChecked ? View.VISIBLE
+									: View.GONE);
+							minutesBox.setVisibility(isChecked ? View.GONE
+									: View.VISIBLE);
+							optionRepeatMinutes.setChecked(!isChecked);
+						}
+					});
+
+			optionRepeatMinutes
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView,
+								boolean isChecked) {
+							optionRepeatDayWeek.setChecked(!isChecked);
+						}
+					});
+			
+			debugClear.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View arg0) {
+					ActivePlaceIts.getInstance(null).clear();
+				}
+			});
 		}
 
 		private void hideCreatePlaceItLayout() {
@@ -115,6 +192,23 @@ public class MapActivity extends FragmentActivity implements
 							new PlaceIt(placeItTitle.getText().toString(),
 									placeItDescription.getText().toString(),
 									lastLocation));
+
+					if (checkRepeating.isChecked()) {
+						// set up repeating event
+						PlaceItPrototype prototype = new PlaceItPrototype(
+								placeItTitle.getText().toString(),
+								placeItDescription.getText().toString(),
+								lastLocation, Integer.parseInt(textRepeatWeeks
+										.getText().toString()),
+								(int) spinnerRepeatDay.getSelectedItemId(),
+								Integer.parseInt(textRepeatMinutes.getText()
+										.toString()), optionRepeatDayWeek
+										.isChecked() ? RepeatMode.DAY_WEEK
+										: RepeatMode.MINUTES);
+
+						RecurringPlaceIts.getInstance(MapActivity.this).add(
+								prototype);
+					}
 
 					hideCreatePlaceItLayout();
 				}
@@ -233,7 +327,7 @@ public class MapActivity extends FragmentActivity implements
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -241,6 +335,9 @@ public class MapActivity extends FragmentActivity implements
 		getUIHandlers().setUpCallbacks();
 		setUpLocationClientIfNeeded();
 		mLocationClient.connect();
+
+		RecurringPlaceIts.getInstance(this);
+		startService(new Intent(this, RecurringScheduler.class));
 	}
 
 	@Override

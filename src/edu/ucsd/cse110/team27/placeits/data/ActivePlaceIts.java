@@ -2,7 +2,7 @@ package edu.ucsd.cse110.team27.placeits.data;
 
 import edu.ucsd.cse110.team27.placeits.MapActivity;
 
-public class ActivePlaceIts extends PlaceIts {
+public class ActivePlaceIts extends PlaceIts<PlaceIt> {
 	
 	public ActivePlaceIts(MapActivity activity) {
 		super(activity);
@@ -37,4 +37,10 @@ public class ActivePlaceIts extends PlaceIts {
 	protected String getFileName() {
 		return "ACTIVE_PLACE_ITS";
 	}
+	
+	@Override
+	protected PlaceIt newInstance() {
+		return new PlaceIt();
+	}
+
 }
