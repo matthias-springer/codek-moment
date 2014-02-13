@@ -1,43 +1,37 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
-import edu.ucsd.cse110.team27.placeits.MapActivity;
-
 public class ActivePlaceIts extends PlaceIts<PlaceIt> {
-	
-	public ActivePlaceIts(MapActivity activity) {
-		super(activity);
-	}
 
 	private static ActivePlaceIts instance;
-	
+
 	/*
 	 * Get Singleton instance of this list.
 	 */
-	public static ActivePlaceIts getInstance(MapActivity activity) {
+	public static ActivePlaceIts getInstance() {
 		if (instance == null) {
-			instance = new ActivePlaceIts(activity);
+			instance = new ActivePlaceIts();
 		}
-		
+
 		return instance;
 	}
-	
+
 	@Override
 	public void add(PlaceIt placeIt) {
 		super.add(placeIt);
 		activity.addPlaceIt(placeIt);
 	}
-	
-	@Override 
+
+	@Override
 	public void remove(PlaceIt placeIt) {
 		super.remove(placeIt);
 		activity.removePlaceIt(placeIt);
 	}
-	
+
 	@Override
 	protected String getFileName() {
 		return "ACTIVE_PLACE_ITS";
 	}
-	
+
 	@Override
 	protected PlaceIt newInstance() {
 		return new PlaceIt();

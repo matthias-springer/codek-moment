@@ -8,19 +8,15 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.content.Context;
 
 import edu.ucsd.cse110.team27.placeits.MapActivity;
 
 public abstract class PlaceIts<T extends PlaceIt> {
 	
-	protected Context appContext;
+	public static MapActivity activity;
 
 	protected List<T> placeIts = new ArrayList<T>();
-
-	protected MapActivity activity;
 
 	private static final String NL = System.getProperty("line.separator");
 	
@@ -30,7 +26,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 	
 	public void save() throws IOException {
 		OutputStreamWriter fileOut = new OutputStreamWriter(
-				appContext.openFileOutput(getFileName(), Context.MODE_PRIVATE));
+				activity.getApplicationContext().openFileOutput(getFileName(), Context.MODE_PRIVATE));
 
 		for (PlaceIt placeit : placeIts) {
 			fileOut.write(placeit.toString() + NL);
@@ -40,9 +36,11 @@ public abstract class PlaceIts<T extends PlaceIt> {
 	}
 
 	public void load() throws IOException {
+		clear();
+		
 		try {
 			BufferedReader fileIn = new BufferedReader(new InputStreamReader(
-					appContext.openFileInput(getFileName())));
+					activity.getApplicationContext().openFileInput(getFileName())));
 
 			String line = "";
 			while ((line = fileIn.readLine()) != null) {
@@ -67,9 +65,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 		clear();
 	}
 
-	public PlaceIts(MapActivity activity) {
-		this.activity = activity;
-		this.appContext = activity.getApplicationContext();
+	public PlaceIts() {
 	}
 	
 	public boolean contains(Object o) {

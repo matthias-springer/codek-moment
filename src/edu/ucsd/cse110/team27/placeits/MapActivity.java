@@ -8,6 +8,7 @@ import edu.ucsd.cse110.team27.placeits.R;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
+import edu.ucsd.cse110.team27.placeits.data.PlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype.RepeatMode;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
@@ -95,7 +96,7 @@ public class MapActivity extends FragmentActivity implements
 		private final EditText textRepeatMinutes;
 
 		private final Button debugClear;
-		
+
 		private LatLng lastLocation;
 
 		public UIHandlers() {
@@ -115,7 +116,7 @@ public class MapActivity extends FragmentActivity implements
 			textRepeatWeeks = (EditText) findViewById(R.id.repeatWeeks);
 			spinnerRepeatDay = (Spinner) findViewById(R.id.repeatDay);
 			textRepeatMinutes = (EditText) findViewById(R.id.repeatMinutes);
-			
+
 			debugClear = (Button) findViewById(R.id.debugClear);
 		}
 
@@ -158,12 +159,12 @@ public class MapActivity extends FragmentActivity implements
 							optionRepeatDayWeek.setChecked(!isChecked);
 						}
 					});
-			
+
 			debugClear.setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View arg0) {
-					ActivePlaceIts.getInstance(null).clear();
+					ActivePlaceIts.getInstance().clear();
 				}
 			});
 		}
@@ -173,6 +174,10 @@ public class MapActivity extends FragmentActivity implements
 			placeItTitle.setText("");
 			placeItDescription.setText("");
 			searchBox.setVisibility(View.VISIBLE);
+		}
+
+		public Marker addMarker(MarkerOptions options) {
+			return mMap.addMarker(options);
 		}
 
 		private void setUpCreatePlaceItButtons() {
@@ -188,7 +193,7 @@ public class MapActivity extends FragmentActivity implements
 
 				@Override
 				public void onClick(View arg0) {
-					ActivePlaceIts.getInstance(MapActivity.this).add(
+					ActivePlaceIts.getInstance().add(
 							new PlaceIt(placeItTitle.getText().toString(),
 									placeItDescription.getText().toString(),
 									lastLocation));
@@ -206,8 +211,7 @@ public class MapActivity extends FragmentActivity implements
 										.isChecked() ? RepeatMode.DAY_WEEK
 										: RepeatMode.MINUTES);
 
-						RecurringPlaceIts.getInstance(MapActivity.this).add(
-								prototype);
+						RecurringPlaceIts.getInstance().add(prototype);
 					}
 
 					hideCreatePlaceItLayout();
@@ -289,25 +293,25 @@ public class MapActivity extends FragmentActivity implements
 		}
 
 		private void setUpMapIfNeeded() {
-			if (mMap == null) {
-				mMap = ((SupportMapFragment) getSupportFragmentManager()
-						.findFragmentById(R.id.map)).getMap();
-				if (mMap != null) {
-					mMap.setMyLocationEnabled(true);
-				}
-
-				mMap.setOnMapClickListener(new OnMapClickListener() {
-
-					@Override
-					public void onMapClick(LatLng latLng) {
-						lastLocation = latLng;
-						createPlaceItLayout.setVisibility(View.VISIBLE);
-						searchBox.setVisibility(View.GONE);
-					}
-				});
-
-				loadPlaceIts();
+			// if (mMap == null) {
+			mMap = ((SupportMapFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.map)).getMap();
+			if (mMap != null) {
+				mMap.setMyLocationEnabled(true);
 			}
+
+			mMap.setOnMapClickListener(new OnMapClickListener() {
+
+				@Override
+				public void onMapClick(LatLng latLng) {
+					lastLocation = latLng;
+					createPlaceItLayout.setVisibility(View.VISIBLE);
+					searchBox.setVisibility(View.GONE);
+				}
+			});
+
+			loadPlaceIts();
+			// }
 		}
 	}
 
@@ -319,8 +323,9 @@ public class MapActivity extends FragmentActivity implements
 
 	private void loadPlaceIts() {
 		try {
-			ActivePlaceIts.getInstance(this).load();
-			PulledDownPlaceIts.getInstance(this).load();
+			ActivePlaceIts.getInstance().load();
+			PulledDownPlaceIts.getInstance().load();
+			RecurringPlaceIts.getInstance().load();
 		} catch (IOException e) {
 			// TODO: error handling
 			e.printStackTrace();
@@ -332,17 +337,30 @@ public class MapActivity extends FragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 
+		PlaceIts.activity = this;
+
 		getUIHandlers().setUpCallbacks();
 		setUpLocationClientIfNeeded();
 		mLocationClient.connect();
 
-		RecurringPlaceIts.getInstance(this);
+		RecurringPlaceIts.getInstance();
 		startService(new Intent(this, RecurringScheduler.class));
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+
+		try {
+			ActivePlaceIts.getInstance().save();
+			PulledDownPlaceIts.getInstance().save();
+			RecurringPlaceIts.getInstance().save();
+		} catch (IOException e) {
+			// TODO: error handling
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+
 		if (mLocationClient != null) {
 			mLocationClient.disconnect();
 		}
@@ -381,15 +399,6 @@ public class MapActivity extends FragmentActivity implements
 	@Override
 	public void onStop() {
 		super.onStop();
-
-		try {
-			ActivePlaceIts.getInstance(this).save();
-			PulledDownPlaceIts.getInstance(this).save();
-		} catch (IOException e) {
-			// TODO: error handling
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 	}
 
 	public void addPlaceIt(PlaceIt placeIt) {

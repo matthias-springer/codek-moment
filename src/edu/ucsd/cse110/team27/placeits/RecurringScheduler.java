@@ -23,7 +23,7 @@ public class RecurringScheduler extends Service {
 
 			@Override
 			public void run() {
-				RecurringPlaceIts.getInstance(null).createPlaceIts();
+				RecurringPlaceIts.getInstance().createPlaceIts();
 				handler.postDelayed(this, 2000);
 			}
 

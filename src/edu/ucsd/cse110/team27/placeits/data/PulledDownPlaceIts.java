@@ -1,34 +1,28 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
-import edu.ucsd.cse110.team27.placeits.MapActivity;
-
 public class PulledDownPlaceIts extends PlaceIts<PlaceIt> {
-	
-	public PulledDownPlaceIts(MapActivity activity) {
-		super(activity);
-	}
 
 	private static PulledDownPlaceIts instance;
-	
+
 	/*
 	 * Get Singleton instance of this list.
 	 */
-	public static PulledDownPlaceIts getInstance(MapActivity activity) {
+	public static PulledDownPlaceIts getInstance() {
 		if (instance == null) {
-			instance = new PulledDownPlaceIts(activity);
+			instance = new PulledDownPlaceIts();
 		}
-		
+
 		return instance;
 	}
-	
+
 	@Override
 	protected String getFileName() {
 		return "PULLED_DOWN_PLACE_ITS";
 	}
-	
+
 	@Override
 	protected PlaceIt newInstance() {
 		return new PlaceIt();
 	}
-	
+
 }

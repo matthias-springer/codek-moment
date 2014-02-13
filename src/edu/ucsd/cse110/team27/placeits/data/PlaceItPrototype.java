@@ -84,7 +84,7 @@ public class PlaceItPrototype extends PlaceIt {
 	}
 
 	public void createNew() {
-		ActivePlaceIts.getInstance(null).add(
+		ActivePlaceIts.getInstance().add(
 				new PlaceIt(getTitle(), getDescription(), getLocation()));
 		updateNextScheduledTime();
 	}
