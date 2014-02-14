@@ -44,7 +44,7 @@ public class distanceService extends Service {
 		return null;
 	}
 
-	public void onCreate(){	
+	public void onCreate(){ 
 		
 			
 		// got the inner list call items with .get(int x) method.
