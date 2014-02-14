@@ -230,6 +230,33 @@ public class MapActivity extends FragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean gpsEn = service
+          .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        
+        LocationManager network  = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean networkEn = service
+          .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        
+        if (!gpsEn) {
+        	Context context = getApplicationContext();
+        	CharSequence text = "GPS is Disabled";
+        	int duration = Toast.LENGTH_SHORT;
+        	
+
+        	Toast toast = Toast.makeText(context, text, duration);
+        	toast.show();
+        }
+        if (!networkEn) {
+        	Context context = getApplicationContext();
+        	CharSequence text = "Network Not Connected";
+        	int duration = Toast.LENGTH_SHORT;
+
+        	Toast toast = Toast.makeText(context, text, duration);
+        	toast.show();
+        }
+        
+        
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
