@@ -87,7 +87,7 @@ public class PlaceItDetails extends Activity {
 		startActivity(new Intent(this, MapActivity.class));
 		
 		// timeer 5000 = 5 sec so 600000 = 10 min
-		new CountDownTimer(5000, 5000) {
+		new CountDownTimer(600000, 600000) {
 
 			// on tick the pulled down will go back to active
 			public void onTick(long millisUntilFinished) {
@@ -128,6 +128,7 @@ public class PlaceItDetails extends Activity {
 		intent = NavUtils.getParentActivityIntent(this);
 		ActivePlaceIts.getInstance(null).add(placeit);
 		PulledDownPlaceIts.getInstance(null).remove(placeit);
+		placeit.setPrint(false);
 		intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
 		NavUtils.navigateUpTo(this, intent);
 	}
