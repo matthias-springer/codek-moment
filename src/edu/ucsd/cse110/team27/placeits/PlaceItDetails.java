@@ -79,6 +79,10 @@ public class PlaceItDetails extends Activity {
 		PulledDownPlaceIts.getInstance(null).add(placeit);
 		ActivePlaceIts.getInstance(null).remove(placeit);
 		
+		NotificationManager notifyMgr = 
+    	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notifyMgr.cancel(placeit.getID());
+		
 		// after clicking snooze navigate back to the map so list refreshes.
 		startActivity(new Intent(this, MapActivity.class));
 		
@@ -109,6 +113,10 @@ public class PlaceItDetails extends Activity {
 	}
 
 	public void pullDownPlaceIt(View view) {
+		NotificationManager notifyMgr = 
+    	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notifyMgr.cancel(placeit.getID());
+		
 		intent = NavUtils.getParentActivityIntent(this);
 		ActivePlaceIts.getInstance(null).remove(placeit);
 		PulledDownPlaceIts.getInstance(null).add(placeit);
