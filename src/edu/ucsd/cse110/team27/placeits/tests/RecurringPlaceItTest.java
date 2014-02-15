@@ -8,7 +8,6 @@ import com.google.android.gms.maps.model.LatLng;
 import edu.ucsd.cse110.team27.placeits.MapActivity;
 import edu.ucsd.cse110.team27.placeits.R;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
-import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
 import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import android.app.Instrumentation;
@@ -71,10 +70,41 @@ public class RecurringPlaceItTest extends
 
 	public void testCreatingPlaceItWhenDue() {
 		testCreateRecurringPlaceIt();
-		When_TheRecurringThePlaceItIsDue();
+		When_TheRecurringPlaceItIsDue();
 		Then_ACopyIsAddedToTheActiveList();
 	}
 
+	public void testNotCreatingPlaceItWhenNotDue() {
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				RecurringPlaceIts.getInstance().clear();
+			}
+		});
+		mInstrumentation.waitForIdleSync();
+		
+		testCreateRecurringPlaceIt();
+		When_TheRecurringPlaceItIsNotDue();
+		
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				ActivePlaceIts.getInstance().clear();
+			}
+		});
+		mInstrumentation.waitForIdleSync();
+		
+		Then_NoCopyIsAddedToTheActiveList();
+	}
+	
+	public void Then_NoCopyIsAddedToTheActiveList() {
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+		}
+		assertEquals(ActivePlaceIts.getInstance().size(), 0);
+	}
+	
 	@SuppressWarnings("deprecation")
 	public void testCalculationOfNextScheduledDate() {
 		Date now;
@@ -94,7 +124,7 @@ public class RecurringPlaceItTest extends
 		
 	}
 	
-	private void When_TheRecurringThePlaceItIsDue() {
+	private void When_TheRecurringPlaceItIsDue() {
 		mActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -111,6 +141,18 @@ public class RecurringPlaceItTest extends
 		}
 	}
 
+	private void When_TheRecurringPlaceItIsNotDue() {
+		RecurringPlaceIts.getInstance().getAtPosition(0)
+				.setNextScheduledTime(new Date((new Date().getTime()) + 10000));
+		
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				ActivePlaceIts.getInstance().clear();
+			}
+		});
+	}
+	
 	private void Then_ACopyIsAddedToTheActiveList() {
 		assertEquals(ActivePlaceIts.getInstance().getAtPosition(0).getTitle(),
 				DEMO_PLACEIT_TITLE);
@@ -118,7 +160,6 @@ public class RecurringPlaceItTest extends
 				.getDescription(), DEMO_PLACEIT_DESCRIPTION);
 		assertEquals(ActivePlaceIts.getInstance().getAtPosition(0).getLatLng(),
 				new LatLng(12, 100));
-
 	}
 
 	private void When_WeTapTheMap() {
