@@ -20,6 +20,14 @@ public class PlaceItsList extends Activity {
 	private ArrayAdapter<PlaceIt> adapter;
 	private int placeItListType;
 	
+	public static int lastList;
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		lastList = getIntent().getIntExtra(PlaceIt.PLACEIT_TYPE_KEY, -1);
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
