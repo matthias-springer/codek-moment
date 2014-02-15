@@ -66,7 +66,7 @@ public class MapActivity extends FragmentActivity implements
 			.setFastestInterval(16) // 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-	private UIHandlers getUIHandlers() {
+	public UIHandlers getUIHandlers() {
 		// NOTE: cannot move Singleton creation to the class itself due to Java
 		// syntax restrictions
 
@@ -77,7 +77,7 @@ public class MapActivity extends FragmentActivity implements
 		return uiHandlers;
 	}
 
-	private class UIHandlers {
+	public class UIHandlers {
 		private final EditText placeItTitle;
 		private final EditText placeItDescription;
 		private final Button cancelCreateButton;
@@ -127,14 +127,31 @@ public class MapActivity extends FragmentActivity implements
 			setUpRepeatingBox();
 		}
 
+		public void onCheckRepeatingCheckChanged(boolean isChecked) {
+			repeatingBox.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+		}
+
+		public void onOptionRepeatDayWeekCheckChanged(boolean isChecked) {
+			dayWeekBox.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+			minutesBox.setVisibility(isChecked ? View.GONE : View.VISIBLE);
+			optionRepeatMinutes.setChecked(!isChecked);
+		}
+
+		public void onOptionRepeatMinutesCheckChanged(boolean isChecked) {
+			optionRepeatDayWeek.setChecked(!isChecked);
+		}
+
+		public void onDebugClearClicked() {
+			ActivePlaceIts.getInstance().clear();
+		}
+
 		private void setUpRepeatingBox() {
 			checkRepeating
 					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView,
 								boolean isChecked) {
-							repeatingBox.setVisibility(isChecked ? View.VISIBLE
-									: View.GONE);
+							onCheckRepeatingCheckChanged(isChecked);
 						}
 					});
 
@@ -143,11 +160,7 @@ public class MapActivity extends FragmentActivity implements
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView,
 								boolean isChecked) {
-							dayWeekBox.setVisibility(isChecked ? View.VISIBLE
-									: View.GONE);
-							minutesBox.setVisibility(isChecked ? View.GONE
-									: View.VISIBLE);
-							optionRepeatMinutes.setChecked(!isChecked);
+							onOptionRepeatDayWeekCheckChanged(isChecked);
 						}
 					});
 
@@ -156,15 +169,14 @@ public class MapActivity extends FragmentActivity implements
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView,
 								boolean isChecked) {
-							optionRepeatDayWeek.setChecked(!isChecked);
+							onOptionRepeatMinutesCheckChanged(isChecked);
 						}
 					});
 
 			debugClear.setOnClickListener(new OnClickListener() {
-
 				@Override
 				public void onClick(View arg0) {
-					ActivePlaceIts.getInstance().clear();
+					onDebugClearClicked();
 				}
 			});
 		}
@@ -180,116 +192,127 @@ public class MapActivity extends FragmentActivity implements
 			return mMap.addMarker(options);
 		}
 
+		public void onCancelCreateButtonClicked() {
+			hideCreatePlaceItLayout();
+		}
+
+		public void onCreateButtonClicked() {
+			ActivePlaceIts.getInstance().add(
+					new PlaceIt(placeItTitle.getText().toString(),
+							placeItDescription.getText().toString(),
+							lastLocation));
+
+			if (checkRepeating.isChecked()) {
+				// set up repeating event
+				PlaceItPrototype prototype = new PlaceItPrototype(
+						placeItTitle.getText().toString(),
+						placeItDescription.getText().toString(),
+						lastLocation,
+						Integer.parseInt(textRepeatWeeks.getText().toString()),
+						(int) spinnerRepeatDay.getSelectedItemId(),
+						Integer.parseInt(textRepeatMinutes.getText().toString()),
+						optionRepeatDayWeek.isChecked() ? RepeatMode.DAY_WEEK
+								: RepeatMode.MINUTES);
+
+				RecurringPlaceIts.getInstance().add(prototype);
+			}
+
+			hideCreatePlaceItLayout();
+		}
+
 		private void setUpCreatePlaceItButtons() {
 			cancelCreateButton.setOnClickListener(new OnClickListener() {
-
 				@Override
 				public void onClick(View arg0) {
-					hideCreatePlaceItLayout();
+					onCancelCreateButtonClicked();
 				}
 			});
 
 			createButton.setOnClickListener(new OnClickListener() {
-
 				@Override
 				public void onClick(View arg0) {
-					ActivePlaceIts.getInstance().add(
-							new PlaceIt(placeItTitle.getText().toString(),
-									placeItDescription.getText().toString(),
-									lastLocation));
-
-					if (checkRepeating.isChecked()) {
-						// set up repeating event
-						PlaceItPrototype prototype = new PlaceItPrototype(
-								placeItTitle.getText().toString(),
-								placeItDescription.getText().toString(),
-								lastLocation, Integer.parseInt(textRepeatWeeks
-										.getText().toString()),
-								(int) spinnerRepeatDay.getSelectedItemId(),
-								Integer.parseInt(textRepeatMinutes.getText()
-										.toString()), optionRepeatDayWeek
-										.isChecked() ? RepeatMode.DAY_WEEK
-										: RepeatMode.MINUTES);
-
-						RecurringPlaceIts.getInstance().add(prototype);
-					}
-
-					hideCreatePlaceItLayout();
+					onCreateButtonClicked();
 				}
 			});
 		}
 
+		private List<Marker> locationMarkers = new ArrayList<Marker>();
+		private final int MAX_MARKERS = 5;
+
+		private void removeMarkers() {
+			for (Marker marker : locationMarkers) {
+				marker.remove();
+			}
+
+			locationMarkers.clear();
+		}
+
+		private void addMarkers(List<Address> addresses) {
+			LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+			for (int i = 0; i < Math.min(MAX_MARKERS, addresses.size()); i++) {
+				LatLng location = new LatLng(addresses.get(i).getLatitude(),
+						addresses.get(i).getLongitude());
+				Marker marker = mMap.addMarker(new MarkerOptions().title(
+						searchBox.getText().toString()).position(location));
+
+				locationMarkers.add(marker);
+				boundsBuilder.include(marker.getPosition());
+			}
+
+			LatLngBounds bounds = boundsBuilder.build();
+			CameraUpdate cameraLocationUpdate = CameraUpdateFactory
+					.newLatLngBounds(bounds, 5);
+			mMap.animateCamera(cameraLocationUpdate);
+		}
+
+		private List<Address> getAddressesFromString(String address) {
+			List<Address> addresses = new ArrayList<Address>();
+
+			try {
+				addresses = (new Geocoder(MapActivity.this))
+						.getFromLocationName(address, Integer.MAX_VALUE);
+			} catch (IOException exc) {
+				Toast.makeText(MapActivity.this, "ERROR: " + exc.getMessage(),
+						Toast.LENGTH_LONG).show();
+			}
+
+			if (addresses.size() == 0) {
+				Toast.makeText(MapActivity.this,
+						"'" + address + "' does not exist.", Toast.LENGTH_LONG)
+						.show();
+			}
+
+			return addresses;
+		}
+
+		public boolean onSearchBoxEditorAction(int actionId, KeyEvent event) {
+			if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+				List<Address> addresses = getAddressesFromString(searchBox
+						.getText().toString());
+
+				if (addresses.size() > 0) {
+					removeMarkers();
+					addMarkers(addresses);
+				}
+			}
+
+			return false;
+		}
+
 		private void setUpSearchBoxHandler() {
 			searchBox.setOnEditorActionListener(new OnEditorActionListener() {
-
-				private List<Marker> locationMarkers = new ArrayList<Marker>();
-				private final int MAX_MARKERS = 5;
-
-				private void removeMarkers() {
-					for (Marker marker : locationMarkers) {
-						marker.remove();
-					}
-
-					locationMarkers.clear();
-				}
-
-				private void addMarkers(List<Address> addresses) {
-					LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-					for (int i = 0; i < Math.min(MAX_MARKERS, addresses.size()); i++) {
-						LatLng location = new LatLng(addresses.get(i)
-								.getLatitude(), addresses.get(i).getLongitude());
-						Marker marker = mMap.addMarker(new MarkerOptions()
-								.title(searchBox.getText().toString())
-								.position(location));
-
-						locationMarkers.add(marker);
-						boundsBuilder.include(marker.getPosition());
-					}
-
-					LatLngBounds bounds = boundsBuilder.build();
-					CameraUpdate cameraLocationUpdate = CameraUpdateFactory
-							.newLatLngBounds(bounds, 5);
-					mMap.animateCamera(cameraLocationUpdate);
-				}
-
-				private List<Address> getAddressesFromString(String address) {
-					List<Address> addresses = new ArrayList<Address>();
-
-					try {
-						addresses = (new Geocoder(MapActivity.this))
-								.getFromLocationName(address, Integer.MAX_VALUE);
-					} catch (IOException exc) {
-						Toast.makeText(MapActivity.this,
-								"ERROR: " + exc.getMessage(), Toast.LENGTH_LONG)
-								.show();
-					}
-
-					if (addresses.size() == 0) {
-						Toast.makeText(MapActivity.this,
-								"'" + address + "' does not exist.",
-								Toast.LENGTH_LONG).show();
-					}
-
-					return addresses;
-				}
-
 				@Override
 				public boolean onEditorAction(TextView arg0, int actionId,
 						KeyEvent event) {
-					if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-						List<Address> addresses = getAddressesFromString(searchBox
-								.getText().toString());
-
-						if (addresses.size() > 0) {
-							removeMarkers();
-							addMarkers(addresses);
-						}
-					}
-
-					return false;
+					return onSearchBoxEditorAction(actionId, event);
 				}
-
 			});
+		}
+
+		public void onMapClick(LatLng latLng) {
+			lastLocation = latLng;
+			createPlaceItLayout.setVisibility(View.VISIBLE);
+			searchBox.setVisibility(View.GONE);
 		}
 
 		private void setUpMapIfNeeded() {
@@ -301,12 +324,9 @@ public class MapActivity extends FragmentActivity implements
 			}
 
 			mMap.setOnMapClickListener(new OnMapClickListener() {
-
 				@Override
 				public void onMapClick(LatLng latLng) {
-					lastLocation = latLng;
-					createPlaceItLayout.setVisibility(View.VISIBLE);
-					searchBox.setVisibility(View.GONE);
+					UIHandlers.this.onMapClick(latLng);
 				}
 			});
 

@@ -24,6 +24,10 @@ public abstract class PlaceIts<T extends PlaceIt> {
 	
 	protected abstract PlaceIt newInstance();
 	
+	public int size() {
+		return placeIts.size();
+	}
+	
 	public void save() throws IOException {
 		OutputStreamWriter fileOut = new OutputStreamWriter(
 				activity.getApplicationContext().openFileOutput(getFileName(), Context.MODE_PRIVATE));
@@ -35,6 +39,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 		fileOut.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void load() throws IOException {
 		clear();
 		
