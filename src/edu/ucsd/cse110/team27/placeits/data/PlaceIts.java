@@ -72,7 +72,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 		return placeIts.contains(placeit);
 	}
 
-	public PlaceIt getAtPosition(int pos) {
+	public T getAtPosition(int pos) {
 		return placeIts.get(pos);
 	}
 

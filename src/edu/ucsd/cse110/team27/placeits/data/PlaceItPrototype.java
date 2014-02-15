@@ -61,7 +61,7 @@ public class PlaceItPrototype extends PlaceIt {
 		if (repeatMode == RepeatMode.DAY_WEEK) {
 			calendar.add(Calendar.DATE,
 					(nextDay - (calendar.get(Calendar.DAY_OF_WEEK) - 1)) % 7);
-			calendar.add(Calendar.DATE, (nextWeek - 1) * 7);
+			calendar.add(Calendar.DATE, (nextWeek - 1) * 7);		// sunday is 1
 		} else if (repeatMode == RepeatMode.MINUTES) {
 			calendar.add(Calendar.MINUTE, nextMinutes);
 		}
@@ -70,8 +70,8 @@ public class PlaceItPrototype extends PlaceIt {
 	}
 
 	private void updateNextScheduledTime() {
-		nextScheduledTime = nextScheduledTime(new Date(), this.week,
-				this.dayOfWeek, this.minutes, this.repeatMode);
+		setNextScheduledTime(nextScheduledTime(new Date(), this.week,
+				this.dayOfWeek, this.minutes, this.repeatMode));
 	}
 
 	public String toString() {
@@ -122,7 +122,15 @@ public class PlaceItPrototype extends PlaceIt {
 	}
 
 	public boolean isDue() {
-		return nextScheduledTime.before(new Date());
+		return getNextScheduledTime().before(new Date());
+	}
+
+	public Date getNextScheduledTime() {
+		return nextScheduledTime;
+	}
+
+	public void setNextScheduledTime(Date nextScheduledTime) {
+		this.nextScheduledTime = nextScheduledTime;
 	}
 
 }
