@@ -11,53 +11,51 @@ import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 
 public class ListViewerTest extends
-ActivityInstrumentationTestCase2<MapActivity> {
+		ActivityInstrumentationTestCase2<MapActivity> {
 
-MapActivity mActivity;
-Instrumentation mInstrumentation;
+	MapActivity mActivity;
+	Instrumentation mInstrumentation;
 
-private final String DEMO_PLACEIT_TITLE = "Demo Place It";
-private final String DEMO_PLACEIT_DESCRIPTION = "This is the description.";
+	private final String DEMO_PLACEIT_TITLE = "Demo Place It";
+	private final String DEMO_PLACEIT_DESCRIPTION = "This is the description.";
 
-public ListViewerTest() {
-super(MapActivity.class);
-}
-@Override
-protected void setUp() throws Exception {
-	super.setUp();
-	Given_TheMapIsShown();
-}
+	public ListViewerTest() {
+		super(MapActivity.class);
+	}
 
-@Override
-protected void tearDown() throws Exception {
-	super.tearDown();
-}
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		Given_TheMapIsShown();
+	}
 
-private void Given_TheMapIsShown() {
-	setActivityInitialTouchMode(false);
-	mActivity = getActivity();
-	mInstrumentation = getInstrumentation();
-}
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
 
-public void testActiveListShown ()
-{
-	when_ActiveListClicked();
-	then_ActiveListShown();
-}
+	private void Given_TheMapIsShown() {
+		setActivityInitialTouchMode(false);
+		mActivity = getActivity();
+		mInstrumentation = getInstrumentation();
+	}
 
-private void when_ActiveListClicked()
-{
-	mActivity.onOptionsItemSelected((MenuItem)mActivity.findViewById(R.id.dropDownActiveList));
-	mActivity.runOnUiThread(new Runnable() {
-		@Override
-		public void run() {
-			ActivePlaceIts.getInstance().clear();
-		}
-	});
-}
+	public void testActiveListShown() {
+		when_ActiveListClicked();
+		then_ActiveListShown();
+	}
 
-public void then_ActiveListShown()
-{
-	assertEquals(PlaceIt.PLACE_IT_ACTIVE, PlaceItsList.lastList);
-}
+	private void when_ActiveListClicked() {
+		mActivity.onOptionListSelected(R.id.dropDownActiveList);
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				ActivePlaceIts.getInstance().clear();
+			}
+		});
+	}
+
+	public void then_ActiveListShown() {
+		assertEquals(PlaceIt.PLACE_IT_ACTIVE, PlaceItsList.lastList);
+	}
 }

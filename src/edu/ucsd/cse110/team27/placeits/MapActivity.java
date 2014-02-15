@@ -349,38 +349,33 @@ public class MapActivity extends FragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
-        boolean gpsEn = service
-          .isProviderEnabled(LocationManager.GPS_PROVIDER);
-        
-        LocationManager network  = (LocationManager) getSystemService(LOCATION_SERVICE);
-        boolean networkEn = service
-          .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        
-        if (!gpsEn) {
-        	Context context = getApplicationContext();
-        	CharSequence text = "GPS is Disabled";
-        	int duration = Toast.LENGTH_SHORT;
-        	
+		LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+		boolean gpsEn = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-        	Toast toast = Toast.makeText(context, text, duration);
-        	toast.show();
-        }
-        if (!networkEn) {
-        	Context context = getApplicationContext();
-        	CharSequence text = "Network Not Connected";
-        	int duration = Toast.LENGTH_SHORT;
+		LocationManager network = (LocationManager) getSystemService(LOCATION_SERVICE);
+		boolean networkEn = service
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        	Toast toast = Toast.makeText(context, text, duration);
-        	toast.show();
-        }
-        
-        
-		
+		if (!gpsEn) {
+			Context context = getApplicationContext();
+			CharSequence text = "GPS is Disabled";
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		}
+		if (!networkEn) {
+			Context context = getApplicationContext();
+			CharSequence text = "Network Not Connected";
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		}
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
-		
-		
+
 	}
 
 	private void loadPlaceIts() {
@@ -470,7 +465,9 @@ public class MapActivity extends FragmentActivity implements
 					.title(placeIt.getTitle())
 					.position(placeIt.getLatLng())
 					.snippet(placeIt.getDescription())
-					.icon(BitmapDescriptorFactory.fromResource(getResources().getIdentifier("posticon", "drawable", getPackageName()))));
+					.icon(BitmapDescriptorFactory.fromResource(getResources()
+							.getIdentifier("posticon", "drawable",
+									getPackageName()))));
 
 			placeIt.setMarker(marker);
 		} catch (Exception exc) {
@@ -486,28 +483,32 @@ public class MapActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    // Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.map_activity_actions, menu);
-	    return super.onCreateOptionsMenu(menu);
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.map_activity_actions, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
-	
+
+	public void onOptionListSelected(int id) {
+		Intent intent;
+		
+		switch (id) {
+		case R.id.dropDownActiveList:
+			intent = new Intent(this, PlaceItsList.class);
+			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_ACTIVE);
+			startActivity(intent);
+			break;
+		case R.id.dropDownPulledList:
+			intent = new Intent(this, PlaceItsList.class);
+			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
+			startActivity(intent);
+			break;
+		}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent;
-		switch(item.getItemId()) {
-			case R.id.dropDownActiveList:
-				intent = new Intent(this, PlaceItsList.class);
-				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_ACTIVE);
-				startActivity(intent);
-				break;
-			case R.id.dropDownPulledList:
-				intent = new Intent(this, PlaceItsList.class);
-				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
-				startActivity(intent);
-				break;
-		}
-		
+		onOptionListSelected(item.getItemId());
 		return true;
 	}
 
