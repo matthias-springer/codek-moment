@@ -34,9 +34,17 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -51,6 +59,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
@@ -337,8 +349,38 @@ public class MapActivity extends FragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean gpsEn = service
+          .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        
+        LocationManager network  = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean networkEn = service
+          .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        
+        if (!gpsEn) {
+        	Context context = getApplicationContext();
+        	CharSequence text = "GPS is Disabled";
+        	int duration = Toast.LENGTH_SHORT;
+        	
+
+        	Toast toast = Toast.makeText(context, text, duration);
+        	toast.show();
+        }
+        if (!networkEn) {
+        	Context context = getApplicationContext();
+        	CharSequence text = "Network Not Connected";
+        	int duration = Toast.LENGTH_SHORT;
+
+        	Toast toast = Toast.makeText(context, text, duration);
+        	toast.show();
+        }
+        
+        
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
+		
+		
 	}
 
 	private void loadPlaceIts() {
@@ -365,6 +407,7 @@ public class MapActivity extends FragmentActivity implements
 
 		RecurringPlaceIts.getInstance();
 		startService(new Intent(this, RecurringScheduler.class));
+		startService(new Intent(this, DistanceService.class));
 	}
 
 	@Override
@@ -425,10 +468,9 @@ public class MapActivity extends FragmentActivity implements
 		try {
 			Marker marker = mMap.addMarker(new MarkerOptions()
 					.title(placeIt.getTitle())
-					.position(placeIt.getLocation())
+					.position(placeIt.getLatLng())
 					.snippet(placeIt.getDescription())
-					.icon(BitmapDescriptorFactory
-							.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+					.icon(BitmapDescriptorFactory.fromResource(getResources().getIdentifier("posticon", "drawable", getPackageName()))));
 
 			placeIt.setMarker(marker);
 		} catch (Exception exc) {
@@ -440,6 +482,33 @@ public class MapActivity extends FragmentActivity implements
 	public void removePlaceIt(PlaceIt placeIt) {
 		placeIt.getMarker().remove();
 		placeIt.setMarker(null);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.map_activity_actions, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
+		switch(item.getItemId()) {
+			case R.id.dropDownActiveList:
+				intent = new Intent(this, PlaceItsList.class);
+				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_ACTIVE);
+				startActivity(intent);
+				break;
+			case R.id.dropDownPulledList:
+				intent = new Intent(this, PlaceItsList.class);
+				intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
+				startActivity(intent);
+				break;
+		}
+		
+		return true;
 	}
 
 }

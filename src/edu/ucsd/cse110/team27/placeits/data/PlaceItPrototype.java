@@ -29,9 +29,9 @@ public class PlaceItPrototype extends PlaceIt {
 		super(title, description, location);
 	}
 
-	public PlaceItPrototype(String title, String description, LatLng location,
+	public PlaceItPrototype(String title, String description, LatLng latLng,
 			int week, int dayOfWeek, int minutes, RepeatMode repeatMode) {
-		super(title, description, location);
+		super(title, description, latLng);
 
 		this.week = week;
 		this.dayOfWeek = dayOfWeek;
@@ -85,7 +85,7 @@ public class PlaceItPrototype extends PlaceIt {
 
 	public void createNew() {
 		ActivePlaceIts.getInstance().add(
-				new PlaceIt(getTitle(), getDescription(), getLocation()));
+				new PlaceIt(getTitle(), getDescription(), getLatLng()));
 		updateNextScheduledTime();
 	}
 

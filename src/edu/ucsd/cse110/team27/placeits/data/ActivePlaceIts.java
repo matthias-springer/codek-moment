@@ -1,5 +1,9 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
+import java.io.IOException;
+
+import android.util.Log;
+
 public class ActivePlaceIts extends PlaceIts<PlaceIt> {
 
 	private static ActivePlaceIts instance;

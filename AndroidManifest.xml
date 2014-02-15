@@ -5,7 +5,7 @@
     android:versionName="2.6.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <instrumentation
@@ -33,19 +33,41 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
+        
         <uses-library android:name="android.test.runner" />
 
         <activity
             android:name="edu.ucsd.cse110.team27.placeits.MapActivity"
-            android:label="Place-Its" >
+            android:excludeFromRecents="true"
+            android:label="Place-Its"
+            android:launchMode="singleTask"
+            android:taskAffinity="" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="edu.ucsd.cse110.team27.placeits.PlaceItsList"
+            android:label="Place-Its-List"
+            android:parentActivityName="edu.ucsd.cse110.team27.placeits.MapActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.ucsd.cse110.team27.placeits.MapActivity" />
+        </activity>
+        <activity
+            android:name="edu.ucsd.cse110.team27.placeits.PlaceItDetails"
+            android:label="Place It Details"
+            android:parentActivityName="edu.ucsd.cse110.team27.placeits.PlaceItsList" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.ucsd.cse110.team27.placeits.PlaceItsList" />
+        </activity>
 
+        <service
+            android:name=".DistanceService"
+            android:enabled="true" />
         <service
             android:name=".RecurringScheduler"
             android:enabled="true" />
