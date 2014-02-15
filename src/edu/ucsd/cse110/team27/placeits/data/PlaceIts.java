@@ -11,10 +11,11 @@ import android.content.Context;
 import android.util.Log;
 
 import edu.ucsd.cse110.team27.placeits.MapActivity;
+import edu.ucsd.cse110.team27.placeits.PlaceItsChangeListener;
 
 public abstract class PlaceIts<T extends PlaceIt> {
 
-	public static MapActivity activity;
+	public static PlaceItsChangeListener activity;
 
 	protected List<T> placeIts = new ArrayList<T>();
 
@@ -26,24 +27,30 @@ public abstract class PlaceIts<T extends PlaceIt> {
 
 	private boolean autoSave = true;
 
+	public static boolean disableIO = false;
+
 	public int size() {
 		return placeIts.size();
 	}
 
 	public void save() throws IOException {
-		OutputStreamWriter fileOut = new OutputStreamWriter(activity
-				.getApplicationContext().openFileOutput(getFileName(),
-						Context.MODE_PRIVATE));
+		if (!disableIO) {
+			OutputStreamWriter fileOut = new OutputStreamWriter(activity
+					.getApplicationContext().openFileOutput(getFileName(),
+							Context.MODE_PRIVATE));
 
-		for (PlaceIt placeit : placeIts) {
-			fileOut.write(placeit.toString() + NL);
+			for (PlaceIt placeit : placeIts) {
+				fileOut.write(placeit.toString() + NL);
+			}
+
+			fileOut.close();
 		}
-
-		fileOut.close();
 	}
 
 	@SuppressWarnings("unchecked")
 	public void load() throws IOException {
+		if (disableIO) return;
+		
 		autoSave = false;
 		clear();
 
@@ -90,7 +97,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 	public void remove(T placeIt) {
 		// Log.d("TEST", "REMOVING " + placeIt.hashCode());
 		placeIts.remove(placeIt);
-		
+
 		if (autoSave) {
 			try {
 				save();
