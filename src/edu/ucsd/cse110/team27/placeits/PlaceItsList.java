@@ -2,7 +2,9 @@ package edu.ucsd.cse110.team27.placeits;
 
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
+import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -17,7 +19,7 @@ import android.support.v4.app.NavUtils;
 
 public class PlaceItsList extends Activity {
 
-	private ArrayAdapter<PlaceIt> adapter;
+	private ArrayAdapter<? extends PlaceIt> adapter;
 	private int placeItListType;
 	
 	public static int lastList;
@@ -50,7 +52,14 @@ public class PlaceItsList extends Activity {
 		                (PlaceIt[]) PulledDownPlaceIts.getInstance().getList().toArray(new PlaceIt[0]));
 				placeItListType = PlaceIt.PLACE_IT_PULLED;
 				setTitle("Pulled Down PlaceIts");
-				break;	
+				break;
+			case PlaceIt.PLACE_IT_PROTOTYPE:
+				adapter = new ArrayAdapter<PlaceItPrototype>(this,
+						android.R.layout.simple_list_item_1,
+						(PlaceItPrototype[]) RecurringPlaceIts.getInstance().getList().toArray(new PlaceItPrototype[0]));
+				placeItListType = PlaceIt.PLACE_IT_PROTOTYPE;
+				setTitle("Recurring PlaceIts");
+				break;
 			default:
 				adapter = new ArrayAdapter<PlaceIt>(this,
 		                android.R.layout.simple_list_item_1, 

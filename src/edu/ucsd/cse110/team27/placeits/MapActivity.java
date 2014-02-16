@@ -251,6 +251,10 @@ public class MapActivity extends FragmentActivity implements
 		private List<Marker> locationMarkers = new ArrayList<Marker>();
 		private final int MAX_MARKERS = 5;
 
+		public List<Marker> getLocationMarkers() {
+			return locationMarkers;
+		}
+		
 		private void removeMarkers() {
 			for (Marker marker : locationMarkers) {
 				marker.remove();
@@ -503,6 +507,10 @@ public class MapActivity extends FragmentActivity implements
 			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PULLED);
 			startActivity(intent);
 			break;
+		case R.id.dropDownRecurringList:
+			intent = new Intent(this, PlaceItsList.class);
+			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PROTOTYPE);
+			startActivity(intent);
 		}
 	}
 

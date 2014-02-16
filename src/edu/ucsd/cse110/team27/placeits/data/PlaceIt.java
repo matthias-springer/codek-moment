@@ -27,6 +27,8 @@ public class PlaceIt {
 	
 	public static final int PLACE_IT_PULLED = 1;
 	
+	public static final int PLACE_IT_PROTOTYPE = 2;
+	
 	public static final String PLACEIT_TYPE_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_TYPE";
 	public static final String PLACEIT_POS_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_POS";
 	

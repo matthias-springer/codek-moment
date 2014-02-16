@@ -2,7 +2,9 @@ package edu.ucsd.cse110.team27.placeits;
 
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
+import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.Activity;
@@ -39,6 +41,11 @@ public class PlaceItDetails extends Activity {
 			placeit = PulledDownPlaceIts.getInstance().
 			getAtPosition(getIntent().getIntExtra(PlaceIt.PLACEIT_POS_KEY, 0));
 			setContentView(R.layout.activity_place_it_details_pulled);
+			break;
+		case PlaceIt.PLACE_IT_PROTOTYPE:
+			placeit = RecurringPlaceIts.getInstance().
+			getAtPosition(getIntent().getIntExtra(PlaceIt.PLACEIT_POS_KEY, 0));
+			setContentView(R.layout.activity_place_it_details_recurring);
 			break;
 		}
 
@@ -133,6 +140,13 @@ public class PlaceItDetails extends Activity {
 		NavUtils.navigateUpTo(this, intent);
 	}
 
+	public void deletePlaceIt(View view) {
+		intent = NavUtils.getParentActivityIntent(this);
+		RecurringPlaceIts.getInstance().remove((PlaceItPrototype) placeit);
+		intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PROTOTYPE);
+		NavUtils.navigateUpTo(this, intent);		
+	}
+	
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */

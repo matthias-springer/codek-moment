@@ -11,6 +11,9 @@
           	<item
           		android:id="@+id/dropDownPulledList"
           		android:title="Pulled Down PlaceIts" />
+          	<item
+          		android:id="@+id/dropDownRecurringList"
+          		android:title="Recurring PlaceIts" />
           </menu>
     </item>
 </menu>
