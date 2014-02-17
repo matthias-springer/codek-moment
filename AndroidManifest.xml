@@ -29,7 +29,7 @@
         android:label="Place-Its" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDi_rLuvZi67byW2Ioo5aha3jsYIrLidAI" />
+            android:value="AIzaSyD3ek6bd38CoX-2XGZob4QZ4Xn3ZPF8DPA" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

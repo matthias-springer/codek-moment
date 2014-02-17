@@ -65,7 +65,7 @@ import android.content.Context;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
-		ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+		ConnectionCallbacks, OnConnectionFailedListener, LocationListener, PlaceItsChangeListener {
 
 	private GoogleMap mMap;
 

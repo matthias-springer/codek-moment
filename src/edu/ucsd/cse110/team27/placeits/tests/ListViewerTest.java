@@ -47,15 +47,28 @@ public class ListViewerTest extends
 
 	private void when_ActiveListClicked() {
 		mActivity.onOptionListSelected(R.id.dropDownActiveList);
-		mActivity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				ActivePlaceIts.getInstance().clear();
-			}
-		});
 	}
 
 	public void then_ActiveListShown() {
 		assertEquals(PlaceIt.PLACE_IT_ACTIVE, PlaceItsList.lastList);
+	}
+
+	public void testPulledDownListShown () {
+		when_PulledDownListClicked();
+		then_PulledDownListShown();
+	}
+
+	private void when_PulledDownListClicked() {
+		mActivity.onOptionListSelected(R.id.dropDownPulledList);
+	}
+
+	private void then_PulledDownListShown() {	
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertEquals(PlaceIt.PLACE_IT_PULLED, PlaceItsList.lastList);
 	}
 }
