@@ -65,7 +65,7 @@ import android.content.Context;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
-		ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+		ConnectionCallbacks, OnConnectionFailedListener, LocationListener, PlaceItsChangeListener {
 
 	private GoogleMap mMap;
 
@@ -483,7 +483,8 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	public void removePlaceIt(PlaceIt placeIt) {
-		placeIt.getMarker().remove();
+		if (placeIt.getMarker() != null)
+			placeIt.getMarker().remove();
 		placeIt.setMarker(null);
 	}
 

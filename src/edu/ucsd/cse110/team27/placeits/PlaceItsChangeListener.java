@@ -1,13 +1,15 @@
 package edu.ucsd.cse110.team27.placeits;
 
-import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import android.content.Context;
+import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 
-interface PlaceItsChangeListener {
-	  public Context getApplicationContext();
-	  
-	  public void removePlaceIt(PlaceIt placeIt);
-	  
-	  public void addPlaceIt(PlaceIt placeIt);
-	  
-	}
+public interface PlaceItsChangeListener {
+	
+	public void addPlaceIt(PlaceIt placeIt);
+
+	public void removePlaceIt(PlaceIt placeIt);
+	
+	public Context getApplicationContext();
+	
+}
+

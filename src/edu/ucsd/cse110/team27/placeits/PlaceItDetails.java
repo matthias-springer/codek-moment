@@ -23,7 +23,7 @@ public class PlaceItDetails extends Activity {
 	private Intent intent;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Show the Up button in the action bar.
@@ -53,10 +53,11 @@ public class PlaceItDetails extends Activity {
 		((TextView) findViewById(R.id.detailsTitle_fill)).setText(placeit.getTitle());
 	}
 
+	public static boolean redirectView = true;
+	
 	/*
 	 * Methods for buttons
 	 */
-
 	public void discardPlaceIt(View view) {
 		NotificationManager notifyMgr = 
     	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -75,7 +76,9 @@ public class PlaceItDetails extends Activity {
 		}
 		NavUtils.navigateUpTo(this, intent);
 		
-		startActivity(new Intent(this, MapActivity.class));
+		if (redirectView) {
+			startActivity(new Intent(this, MapActivity.class));
+		}
 		
 		
 	}
