@@ -24,6 +24,7 @@ public class MapMarkerTest extends
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		Given_TheMapIsShown();
 		mActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -31,7 +32,6 @@ public class MapMarkerTest extends
 			}
 		});
 		mInstrumentation.waitForIdleSync();
-		Given_TheMapIsShown();
 	}
 
 	@Override
@@ -73,17 +73,27 @@ public class MapMarkerTest extends
 		});
 		mInstrumentation.waitForIdleSync();
 	}
-	
+
 	private PlaceIt placeIt;
-	
+
 	private void Then_AMarkerIsShownOnTheMap() {
-		placeIt = ActivePlaceIts.getInstance().getAtPosition(0);
-		
-		assertEquals(placeIt.getTitle(), placeIt.getMarker().getTitle());
-		assertEquals(placeIt.getDescription(), placeIt.getMarker().getSnippet());
-		assertEquals(placeIt.getMarker().getPosition(), placeIt.getLatLng());
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				placeIt = ActivePlaceIts.getInstance().getAtPosition(0);
+
+				assertEquals(placeIt.getTitle(), placeIt.getMarker().getTitle());
+				assertEquals(placeIt.getDescription(), placeIt.getMarker()
+						.getSnippet());
+				assertEquals(placeIt.getMarker().getPosition().latitude,
+						placeIt.getLatLng().latitude, 0.01);
+				assertEquals(placeIt.getMarker().getPosition().longitude,
+						placeIt.getLatLng().longitude, 0.01);
+			}
+		});
+		mInstrumentation.waitForIdleSync();
 	}
-	
+
 	private void When_ThePlaceItIsPulledDown() {
 		mActivity.runOnUiThread(new Runnable() {
 			@Override
@@ -93,7 +103,7 @@ public class MapMarkerTest extends
 		});
 		mInstrumentation.waitForIdleSync();
 	}
-	
+
 	private void Then_TheMarkerIsDeleted() {
 		assertEquals(placeIt.getMarker(), null);
 	}

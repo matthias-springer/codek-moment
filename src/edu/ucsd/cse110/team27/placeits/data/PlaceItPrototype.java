@@ -74,8 +74,8 @@ public class PlaceItPrototype extends PlaceIt {
 				this.dayOfWeek, this.minutes, this.repeatMode));
 	}
 
-	public String toString() {
-		return super.toString() + DELIM + week + DELIM + dayOfWeek + DELIM
+	public String toFileString() {
+		return super.toFileString() + DELIM + week + DELIM + dayOfWeek + DELIM
 				+ minutes + DELIM + (repeatMode == RepeatMode.MINUTES ? MINUTES : DAY_WEEK);
 	}
 

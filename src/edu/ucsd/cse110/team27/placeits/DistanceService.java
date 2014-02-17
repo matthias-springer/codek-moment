@@ -106,9 +106,14 @@ public class DistanceService extends Service {
 
 		String bestProvider = locationManager.getBestProvider(criteria, false);
 		Location location = locationManager.getLastKnownLocation(bestProvider);
-		LatLng myPosition= new LatLng(location.getLatitude(), location.getLongitude());
-		
-		return myPosition;
+		if (location != null) {
+			LatLng myPosition= new LatLng(location.getLatitude(), location.getLongitude());
+			return myPosition;
+		}
+		else {
+			// no current location (TODO)
+			return new LatLng(0,10);
+		}
 	}
 
     private void printNotification(String title, String text, PlaceIt object) {

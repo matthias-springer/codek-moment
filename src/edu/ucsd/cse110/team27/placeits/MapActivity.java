@@ -278,7 +278,9 @@ public class MapActivity extends FragmentActivity implements
 			LatLngBounds bounds = boundsBuilder.build();
 			CameraUpdate cameraLocationUpdate = CameraUpdateFactory
 					.newLatLngBounds(bounds, 5);
-			mMap.animateCamera(cameraLocationUpdate);
+			try {
+				mMap.animateCamera(cameraLocationUpdate);
+			} catch (Exception e) { }
 		}
 
 		private List<Address> getAddressesFromString(String address) {

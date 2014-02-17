@@ -36,7 +36,7 @@ public abstract class PlaceIts<T extends PlaceIt> {
 						Context.MODE_PRIVATE));
 
 		for (PlaceIt placeit : placeIts) {
-			fileOut.write(placeit.toString() + NL);
+			fileOut.write(placeit.toFileString() + NL);
 		}
 
 		fileOut.close();

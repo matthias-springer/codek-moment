@@ -44,9 +44,13 @@ public class PlaceIt {
 		return this;
 	}
 
-	public String toString() {
+	public String toFileString() {
 		return getTitle() + DELIM + getDescription() + DELIM
 				+ getLatLng().latitude + DELIM + getLatLng().longitude;
+	}
+	
+	public String toString() {
+		return getTitle();
 	}
 
 	public PlaceIt(String title, String description, LatLng latLng) {

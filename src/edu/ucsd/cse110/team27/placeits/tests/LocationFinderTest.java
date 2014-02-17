@@ -25,7 +25,6 @@ public class LocationFinderTest extends
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		mInstrumentation.waitForIdleSync();
 		Given_TheMapIsShown();
 	}
 
@@ -48,6 +47,7 @@ public class LocationFinderTest extends
 		setActivityInitialTouchMode(false);
 		mActivity = getActivity();
 		mInstrumentation = getInstrumentation();
+		mInstrumentation.waitForIdleSync();
 	}
 	
 	public void testLocationFinder() {
@@ -72,11 +72,18 @@ public class LocationFinderTest extends
 		} catch (InterruptedException e) {
 		}
 		
-		List<Marker> markers = mActivity.getUIHandlers().getLocationMarkers();
-		
-		assertEquals(1, markers.size());
-		assertEquals(markers.get(0).getTitle(), "Berlin");
-		assertEquals(markers.get(0).getPosition().latitude, 123);
-		assertEquals(markers.get(0).getPosition().longitude, 567);
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				List<Marker> markers = mActivity.getUIHandlers().getLocationMarkers();
+				
+				assertEquals(1, markers.size());
+				assertEquals(markers.get(0).getTitle(), "Berlin");
+				assertEquals((int) markers.get(0).getPosition().latitude, 52);
+				assertEquals((int) markers.get(0).getPosition().longitude, 13);
+			}
+		});
+		mInstrumentation.waitForIdleSync();
+
 	}
 }
