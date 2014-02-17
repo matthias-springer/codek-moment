@@ -353,11 +353,15 @@ public class MapActivity extends FragmentActivity implements
 		}
 	}
 
+	public LocationManager locationManager;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
 		boolean gpsEn = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
+		locationManager = service;
+		
 		LocationManager network = (LocationManager) getSystemService(LOCATION_SERVICE);
 		boolean networkEn = service
 				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -408,7 +412,6 @@ public class MapActivity extends FragmentActivity implements
 
 		RecurringPlaceIts.getInstance();
 		startService(new Intent(this, RecurringScheduler.class));
-		startService(new Intent(this, DistanceService.class));
 	}
 
 	@Override
@@ -437,6 +440,10 @@ public class MapActivity extends FragmentActivity implements
 		}
 	}
 
+	public static Location lastLocation = null;
+	
+	private boolean distanceServiceStarted = false;
+	
 	@Override
 	public void onLocationChanged(Location location) {
 		/*
@@ -445,6 +452,12 @@ public class MapActivity extends FragmentActivity implements
 		 * cameraLocationUpdate = CameraUpdateFactory.newLatLng(locationOfLast);
 		 * mMap.animateCamera( cameraLocationUpdate);
 		 */
+		lastLocation = location;
+	
+		if (!distanceServiceStarted) {
+			startService(new Intent(this, DistanceService.class));
+			distanceServiceStarted = true;
+		}
 	}
 
 	@Override
@@ -481,7 +494,11 @@ public class MapActivity extends FragmentActivity implements
 					Toast.LENGTH_LONG).show();
 		}
 	}
-
+	
+	public LocationClient getLocationClient() {
+		return mLocationClient;
+	}
+	
 	public void removePlaceIt(PlaceIt placeIt) {
 		if (placeIt.getMarker() != null)
 			placeIt.getMarker().remove();

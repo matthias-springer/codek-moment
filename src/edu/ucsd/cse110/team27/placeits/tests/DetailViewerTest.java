@@ -12,6 +12,7 @@ import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 
 // this fails atm
 public class DetailViewerTest extends
@@ -89,10 +90,30 @@ public class DetailViewerTest extends
 		assertTrue(ActivePlaceIts.getInstance().contains(placeit));
 	}
 
+	private void then_placeItNotInActiveList() {
+		assertFalse(ActivePlaceIts.getInstance().contains(placeit));
+	}
+	
 	private void when_repostButtonClicked() {
 		mActivity.repostPlaceIt(null);
 	}
 
+	private void when_SnoozeButtonClicked() {
+		mActivity.snoozePlaceIt(null, -1);
+	}
+	
+	private void when_TimeHasPassed() {
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+		}
+	}
+	
+	
+	private void then_NotificationIsShownAgain() {
+		assertTrue(mActivity.shownAgain.value);
+	}
+	
 	private void given_placeItInPulledDownList() {
 		setActivityInitialTouchMode(false);
 		placeit = new PlaceIt(DEMO_PLACEIT_TITLE, DEMO_PLACEIT_DESCRIPTION,
@@ -107,29 +128,16 @@ public class DetailViewerTest extends
 		setActivityIntent(intent);
 		mActivity = getActivity();
 		
-		/*oldListener = PlaceIts.activity;
-		
-		PlaceIts.activity = new PlaceItsChangeListener() {
 
-			@Override
-			public void addPlaceIt(PlaceIt placeIt) {
-			}
-
-			@Override
-			public void removePlaceIt(PlaceIt placeIt) {
-			}
-
-			@Override
-			public Context getApplicationContext() {
-				return null;
-			}
-		};*/
 		mInstrumentation = getInstrumentation();
 	}
 
 	public void testSnooze() {
-		//John or Robert - write this test
-		fail("John or Robert - write this test");
+		given_placeItInActiveList();
+		when_SnoozeButtonClicked();
+		then_placeItNotInActiveList();
+		when_TimeHasPassed();
+		then_NotificationIsShownAgain();
 	}
 
 	private void then_placeItInPulledDownList() {

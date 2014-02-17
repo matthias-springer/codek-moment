@@ -51,6 +51,8 @@ public class PlaceItDetails extends Activity {
 
 		((TextView) findViewById(R.id.detailsDescription_fill)).setText(placeit.getDescription());
 		((TextView) findViewById(R.id.detailsTitle_fill)).setText(placeit.getTitle());
+		
+		placeit.setPrint(true);
 	}
 
 	public static boolean redirectView = true;
@@ -84,30 +86,45 @@ public class PlaceItDetails extends Activity {
 	}
 
 	public void snoozePlaceIt(View view) {
-		//TODO: Add snooze functionality
-		
+		snoozePlaceIt(view, 600000);
+	}
+	
+	public class BoolWrapper {
+		public boolean value = false;
+	}
+	
+	public final BoolWrapper shownAgain = new BoolWrapper();
+	
+	public void snoozePlaceIt(View view, int time) {
 		PulledDownPlaceIts.getInstance().add(placeit);
 		ActivePlaceIts.getInstance().remove(placeit);
 		
 		NotificationManager notifyMgr = 
     	        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		shownAgain.value = true;
 		notifyMgr.cancel(placeit.getID());
 		
+		if (time != -1) {
 		// after clicking snooze navigate back to the map so list refreshes.
-		startActivity(new Intent(this, MapActivity.class));
+			startActivity(new Intent(this, MapActivity.class));
+		}
+		
+		if (time == -1) time = 1000;
 		
 		// timeer 5000 = 5 sec so 600000 = 10 min
-		new CountDownTimer(600000, 600000) {
+		new CountDownTimer(time, time) {
 
 			// on tick the pulled down will go back to active
 			public void onTick(long millisUntilFinished) {
 				// do nothing 
 				ActivePlaceIts.getInstance().add(placeit);
 				PulledDownPlaceIts.getInstance().remove(placeit);
+				shownAgain.value = true;
 			}
 			
 			// on finish repost the place it. 
 			public void onFinish() {
+				shownAgain.value = true;
 				placeit.setPrint(false);
 				repostPlaceIt(null);
 
