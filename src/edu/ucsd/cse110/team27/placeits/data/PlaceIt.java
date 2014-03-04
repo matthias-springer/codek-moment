@@ -7,6 +7,8 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import edu.ucsd.cse110.team27.placeits.data.location.PlaceItLocationStrategy;
+
 public class PlaceIt {
 
 	protected static final String DELIM = "~◙;◙~";
@@ -15,7 +17,7 @@ public class PlaceIt {
 
 	private String description;
 
-	private LatLng latLng;
+	private PlaceItLocationStrategy locationStrategy;
 
 	private Marker marker;
 	
@@ -32,21 +34,18 @@ public class PlaceIt {
 	public static final String PLACEIT_TYPE_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_TYPE";
 	public static final String PLACEIT_POS_KEY = "com.ucsd.edu.cse110.team27.placeits.PLACE_IT_POS";
 	
-	// TODO: expiration date, recurring time
 
 	public PlaceIt load(String line) {
 		String[] placeitData = line.split(DELIM);
 		this.title = placeitData[0];
 		this.description = placeitData[1];
-		this.latLng = new LatLng(Double.parseDouble(placeitData[2]),
-				Double.parseDouble(placeitData[3]));
 
 		return this;
 	}
 
 	public String toFileString() {
-		return getTitle() + DELIM + getDescription() + DELIM
-				+ getLatLng().latitude + DELIM + getLatLng().longitude;
+		return getTitle() + DELIM + getDescription() + DELIM + locationStrategy.toFileString();
+				//+ getLatLng().latitude + DELIM + getLatLng().longitude;
 	}
 	
 	public String toString() {
@@ -93,14 +92,6 @@ public class PlaceIt {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public LatLng getLatLng() {
-		return latLng;
-	}
-
-	public void setLatLng(LatLng latLng) {
-		this.latLng = latLng;
 	}
 	
 	public Location getLocation() {

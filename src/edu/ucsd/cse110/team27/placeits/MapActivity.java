@@ -89,6 +89,9 @@ public class MapActivity extends FragmentActivity implements
 		return uiHandlers;
 	}
 
+	/**
+	 * This class handles all UI event stuff. Contains callbacks and references to views.
+	 */
 	public class UIHandlers {
 		private final EditText placeItTitle;
 		private final EditText placeItDescription;
@@ -263,6 +266,9 @@ public class MapActivity extends FragmentActivity implements
 			locationMarkers.clear();
 		}
 
+		/**
+		 * Adds address markers to the map.
+		 */
 		private void addMarkers(List<Address> addresses) {
 			LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 			for (int i = 0; i < Math.min(MAX_MARKERS, addresses.size()); i++) {
