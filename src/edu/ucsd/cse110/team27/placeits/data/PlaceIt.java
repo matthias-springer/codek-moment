@@ -7,7 +7,9 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import edu.ucsd.cse110.team27.placeits.data.location.CategoryLocationStrategy;
 import edu.ucsd.cse110.team27.placeits.data.location.PlaceItLocationStrategy;
+import edu.ucsd.cse110.team27.placeits.data.location.StaticLocationStrategy;
 
 public class PlaceIt {
 
@@ -17,7 +19,7 @@ public class PlaceIt {
 
 	private String description;
 
-	private PlaceItLocationStrategy locationStrategy;
+	protected PlaceItLocationStrategy locationStrategy;
 
 	private Marker marker;
 	
@@ -39,27 +41,43 @@ public class PlaceIt {
 		String[] placeitData = line.split(DELIM);
 		this.title = placeitData[0];
 		this.description = placeitData[1];
-
+		this.locationStrategy = PlaceItLocationStrategy.create(placeitData[2]);
 		return this;
 	}
 
 	public String toFileString() {
 		return getTitle() + DELIM + getDescription() + DELIM + locationStrategy.toFileString();
-				//+ getLatLng().latitude + DELIM + getLatLng().longitude;
 	}
 	
 	public String toString() {
 		return getTitle();
 	}
 
+	/**
+	 * Creates a static location PlaceIt.
+	 */
 	public PlaceIt(String title, String description, LatLng latLng) {
 		this.setTitle(title);
 		this.setDescription(description);
-		this.setLatLng(latLng);
+		this.locationStrategy = new StaticLocationStrategy(latLng);
 	}
 
+	/**
+	 * Creates a categorized PlaceIt.
+	 */
+	public PlaceIt(String title, String description, String cat1, String cat2, String cat3) {
+		this.setTitle(title);
+		this.setDescription(description);
+		this.locationStrategy = new CategoryLocationStrategy(cat1, cat2, cat3);
+	}
+	
 	public PlaceIt() {
 
+	}
+	
+	public PlaceItLocationStrategy getStrategy() {
+		if (locationStrategy == null) locationStrategy = new StaticLocationStrategy(new LatLng(0, 0));
+		return locationStrategy;
 	}
 	
 	public int getID() {
@@ -94,15 +112,17 @@ public class PlaceIt {
 		this.description = description;
 	}
 	
+	/**
+	 * Get location for the PlaceIt. If it is a categorized PlaceIt, then this method returns null.
+	 */
 	public Location getLocation() {
-		Location location = new Location("");
-		location.setLatitude(latLng.latitude);
-		location.setLongitude(latLng.longitude);
-		location.setTime(new Date().getTime());
-		
-		return location;
+		return getStrategy().getLocation();
 	}
 
+	public LatLng getLatLng() {
+		return getLocation() == null ? null : new LatLng(getLocation().getLatitude(), getLocation().getLongitude());
+	}
+	
 	public Marker getMarker() {
 		return marker;
 	}
@@ -118,7 +138,7 @@ public class PlaceIt {
 		PlaceIt other = (PlaceIt) o;
 		return other.getTitle().equals(getTitle())
 				&& other.getDescription().equals(getDescription())
-				&& other.getLatLng().equals(getLatLng());
+				&& other.getStrategy().equals(getStrategy());
 	}
 
 	@Override

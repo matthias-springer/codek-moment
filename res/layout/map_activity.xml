@@ -43,6 +43,22 @@
             android:ems="10"
             android:hint="Description" />
 
+        <Spinner
+            android:id="@+id/cat1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/str_categories" />
+        <Spinner
+            android:id="@+id/cat2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/str_categories" />
+        <Spinner
+            android:id="@+id/cat3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/str_categories" />
+                
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"

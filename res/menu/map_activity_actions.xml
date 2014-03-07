@@ -14,6 +14,9 @@
           	<item
           		android:id="@+id/dropDownRecurringList"
           		android:title="Recurring PlaceIts" />
+          	<item 
+          	    android:id="@+id/catPlaceIt"
+          	    android:title="Create Categorized Place-It" />
           </menu>
     </item>
 </menu>
