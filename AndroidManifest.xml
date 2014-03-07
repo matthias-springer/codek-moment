@@ -30,24 +30,29 @@
         android:label="Place-Its" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDi_rLuvZi67byW2Ioo5aha3jsYIrLidAI" />
+            android:value="AIzaSyCr_XODXSoCv0uiiO7BmxZ3EUKo7b3AsgQ" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        
-        <uses-library android:name="android.test.runner" />
 
+        <uses-library android:name="android.test.runner" />
+        
+		<activity
+            android:name="edu.ucsd.cse110.team27.placeits.LoginActivity"
+            android:label="Place-Its"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="edu.ucsd.cse110.team27.placeits.MapActivity"
             android:excludeFromRecents="true"
             android:label="Place-Its"
             android:launchMode="singleTask"
             android:taskAffinity="" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="edu.ucsd.cse110.team27.placeits.PlaceItsList"
@@ -67,10 +72,10 @@
         </activity>
 
         <service
-            android:name=".DistanceService"
+            android:name="edu.ucsd.cse110.team27.placeits.DistanceService"
             android:enabled="true" />
         <service
-            android:name=".RecurringScheduler"
+            android:name="edu.ucsd.cse110.team27.placeits.RecurringScheduler"
             android:enabled="true" />
     </application>
 
