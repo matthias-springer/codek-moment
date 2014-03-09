@@ -2,9 +2,6 @@ package edu.ucsd.cse110.team27.placeits.data.location;
 
 import android.location.Location;
 
-import com.google.android.gms.internal.da;
-import com.google.android.gms.maps.model.LatLng;
-
 public abstract class PlaceItLocationStrategy {
 
 	static final String DELIM = "~☺;☺~";
@@ -15,6 +12,9 @@ public abstract class PlaceItLocationStrategy {
 	
 	public abstract Location getLocation();
 	
+	public abstract boolean isWithinDistance(Location location, float distance);
+	
+	public abstract boolean isCategorizedPlaceIt();
 	
 	// note: Java is ugly, it does not allow adding static methods to interface!
 	/**

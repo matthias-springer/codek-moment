@@ -518,19 +518,22 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	public void addPlaceIt(PlaceIt placeIt) {
-		try {
-			Marker marker = mMap.addMarker(new MarkerOptions()
-					.title(placeIt.getTitle())
-					.position(placeIt.getLatLng())
-					.snippet(placeIt.getDescription())
-					.icon(BitmapDescriptorFactory.fromResource(getResources()
-							.getIdentifier("posticon", "drawable",
-									getPackageName()))));
+		if (!placeIt.isCategorizedPlaceIt()) {
+			try {
+				Marker marker = mMap.addMarker(new MarkerOptions()
+						.title(placeIt.getTitle())
+						.position(placeIt.getLatLng())
+						.snippet(placeIt.getDescription())
+						.icon(BitmapDescriptorFactory
+								.fromResource(getResources().getIdentifier(
+										"posticon", "drawable",
+										getPackageName()))));
 
-			placeIt.setMarker(marker);
-		} catch (Exception exc) {
-			Toast.makeText(this, "Could not create Place-It.",
-					Toast.LENGTH_LONG).show();
+				placeIt.setMarker(marker);
+			} catch (Exception exc) {
+				Toast.makeText(this, "Could not create Place-It.",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 

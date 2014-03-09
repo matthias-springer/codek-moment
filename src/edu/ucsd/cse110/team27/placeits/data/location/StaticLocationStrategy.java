@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class StaticLocationStrategy extends PlaceItLocationStrategy {
 
 	private LatLng latLng;
-
+	
 	public StaticLocationStrategy () {
 		
 	}
@@ -32,6 +32,11 @@ public class StaticLocationStrategy extends PlaceItLocationStrategy {
 	}
 
 	@Override
+	public boolean isCategorizedPlaceIt() {
+		return false;
+	}
+	
+	@Override
 	public void load(String data) {
 		String[] splitted = data.split(DELIM);
 		this.latLng = new LatLng(Double.parseDouble(splitted[1]),
@@ -53,5 +58,10 @@ public class StaticLocationStrategy extends PlaceItLocationStrategy {
 		location.setTime(new Date().getTime());
 		
 		return location;
+	}
+
+	@Override
+	public boolean isWithinDistance(Location location, float distance) {
+		return getLocation().distanceTo(location) <= distance;
 	}
 }

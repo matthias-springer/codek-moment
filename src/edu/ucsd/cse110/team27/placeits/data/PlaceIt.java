@@ -75,6 +75,19 @@ public class PlaceIt {
 
 	}
 	
+	public boolean isCategorizedPlaceIt() {
+		return locationStrategy != null && locationStrategy.isCategorizedPlaceIt();
+	}
+	
+	public boolean isWithinDistance(Location location, float distance) {
+		if (locationStrategy != null) {
+			return locationStrategy.isWithinDistance(location, distance);
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public PlaceItLocationStrategy getStrategy() {
 		if (locationStrategy == null) locationStrategy = new StaticLocationStrategy(new LatLng(0, 0));
 		return locationStrategy;
