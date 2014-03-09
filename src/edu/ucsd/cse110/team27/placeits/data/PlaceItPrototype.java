@@ -85,7 +85,7 @@ public class PlaceItPrototype extends PlaceIt {
 
 	public void createNew() {
 		ActivePlaceIts.getInstance().add(
-				new PlaceIt(getTitle(), getDescription(), getLatLng()));
+				new PlaceIt(getTitle(), getDescription(), locationStrategy.getLocation() == null ? null : new LatLng(locationStrategy.getLocation().getLatitude(), locationStrategy.getLocation().getLongitude())));
 		updateNextScheduledTime();
 	}
 

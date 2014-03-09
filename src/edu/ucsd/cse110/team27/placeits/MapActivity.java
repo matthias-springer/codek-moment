@@ -65,7 +65,8 @@ import android.content.Context;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
-		ConnectionCallbacks, OnConnectionFailedListener, LocationListener, PlaceItsChangeListener {
+		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
+		PlaceItsChangeListener {
 
 	private GoogleMap mMap;
 
@@ -89,6 +90,10 @@ public class MapActivity extends FragmentActivity implements
 		return uiHandlers;
 	}
 
+	/**
+	 * This class handles all UI event stuff. Contains callbacks and references
+	 * to views.
+	 */
 	public class UIHandlers {
 		private final EditText placeItTitle;
 		private final EditText placeItDescription;
@@ -106,6 +111,10 @@ public class MapActivity extends FragmentActivity implements
 		private final EditText textRepeatWeeks;
 		private final Spinner spinnerRepeatDay;
 		private final EditText textRepeatMinutes;
+
+		private final Spinner cat1;
+		private final Spinner cat2;
+		private final Spinner cat3;
 
 		private final Button debugClear;
 
@@ -128,6 +137,10 @@ public class MapActivity extends FragmentActivity implements
 			textRepeatWeeks = (EditText) findViewById(R.id.repeatWeeks);
 			spinnerRepeatDay = (Spinner) findViewById(R.id.repeatDay);
 			textRepeatMinutes = (EditText) findViewById(R.id.repeatMinutes);
+
+			cat1 = (Spinner) findViewById(R.id.cat1);
+			cat2 = (Spinner) findViewById(R.id.cat2);
+			cat3 = (Spinner) findViewById(R.id.cat3);
 
 			debugClear = (Button) findViewById(R.id.debugClear);
 		}
@@ -209,10 +222,20 @@ public class MapActivity extends FragmentActivity implements
 		}
 
 		public void onCreateButtonClicked() {
-			ActivePlaceIts.getInstance().add(
-					new PlaceIt(placeItTitle.getText().toString(),
-							placeItDescription.getText().toString(),
-							lastLocation));
+			PlaceIt placeIt;
+			if (lastLocation != null) {
+				// create static (non-categorized Place-It)
+				placeIt = new PlaceIt(placeItTitle.getText().toString(),
+						placeItDescription.getText().toString(), lastLocation);
+			} else {
+				placeIt = new PlaceIt(placeItTitle.getText().toString(),
+						placeItDescription.getText().toString(), cat1
+								.getSelectedItem().toString(), cat2
+								.getSelectedItem().toString(), cat3
+								.getSelectedItem().toString());
+			}
+
+			ActivePlaceIts.getInstance().add(placeIt);
 
 			if (checkRepeating.isChecked()) {
 				// set up repeating event
@@ -254,7 +277,7 @@ public class MapActivity extends FragmentActivity implements
 		public List<Marker> getLocationMarkers() {
 			return locationMarkers;
 		}
-		
+
 		private void removeMarkers() {
 			for (Marker marker : locationMarkers) {
 				marker.remove();
@@ -263,6 +286,9 @@ public class MapActivity extends FragmentActivity implements
 			locationMarkers.clear();
 		}
 
+		/**
+		 * Adds address markers to the map.
+		 */
 		private void addMarkers(List<Address> addresses) {
 			LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 			for (int i = 0; i < Math.min(MAX_MARKERS, addresses.size()); i++) {
@@ -280,7 +306,8 @@ public class MapActivity extends FragmentActivity implements
 					.newLatLngBounds(bounds, 5);
 			try {
 				mMap.animateCamera(cameraLocationUpdate);
-			} catch (Exception e) { }
+			} catch (Exception e) {
+			}
 		}
 
 		private List<Address> getAddressesFromString(String address) {
@@ -331,6 +358,18 @@ public class MapActivity extends FragmentActivity implements
 			lastLocation = latLng;
 			createPlaceItLayout.setVisibility(View.VISIBLE);
 			searchBox.setVisibility(View.GONE);
+			cat1.setVisibility(View.GONE);
+			cat2.setVisibility(View.GONE);
+			cat3.setVisibility(View.GONE);
+		}
+
+		public void showCatPlaceItCreationDialog() {
+			lastLocation = null;
+			createPlaceItLayout.setVisibility(View.VISIBLE);
+			searchBox.setVisibility(View.GONE);
+			cat1.setVisibility(View.VISIBLE);
+			cat2.setVisibility(View.VISIBLE);
+			cat3.setVisibility(View.VISIBLE);
 		}
 
 		private void setUpMapIfNeeded() {
@@ -354,14 +393,14 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	public LocationManager locationManager;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
 		boolean gpsEn = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
 		locationManager = service;
-		
+
 		LocationManager network = (LocationManager) getSystemService(LOCATION_SERVICE);
 		boolean networkEn = service
 				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -441,9 +480,9 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	public static Location lastLocation = null;
-	
+
 	private boolean distanceServiceStarted = false;
-	
+
 	@Override
 	public void onLocationChanged(Location location) {
 		/*
@@ -453,7 +492,7 @@ public class MapActivity extends FragmentActivity implements
 		 * mMap.animateCamera( cameraLocationUpdate);
 		 */
 		lastLocation = location;
-	
+
 		if (!distanceServiceStarted) {
 			startService(new Intent(this, DistanceService.class));
 			distanceServiceStarted = true;
@@ -479,26 +518,29 @@ public class MapActivity extends FragmentActivity implements
 	}
 
 	public void addPlaceIt(PlaceIt placeIt) {
-		try {
-			Marker marker = mMap.addMarker(new MarkerOptions()
-					.title(placeIt.getTitle())
-					.position(placeIt.getLatLng())
-					.snippet(placeIt.getDescription())
-					.icon(BitmapDescriptorFactory.fromResource(getResources()
-							.getIdentifier("posticon", "drawable",
-									getPackageName()))));
+		if (!placeIt.isCategorizedPlaceIt()) {
+			try {
+				Marker marker = mMap.addMarker(new MarkerOptions()
+						.title(placeIt.getTitle())
+						.position(placeIt.getLatLng())
+						.snippet(placeIt.getDescription())
+						.icon(BitmapDescriptorFactory
+								.fromResource(getResources().getIdentifier(
+										"posticon", "drawable",
+										getPackageName()))));
 
-			placeIt.setMarker(marker);
-		} catch (Exception exc) {
-			Toast.makeText(this, "Could not create Place-It.",
-					Toast.LENGTH_LONG).show();
+				placeIt.setMarker(marker);
+			} catch (Exception exc) {
+				Toast.makeText(this, "Could not create Place-It.",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
-	
+
 	public LocationClient getLocationClient() {
 		return mLocationClient;
 	}
-	
+
 	public void removePlaceIt(PlaceIt placeIt) {
 		if (placeIt.getMarker() != null)
 			placeIt.getMarker().remove();
@@ -515,7 +557,7 @@ public class MapActivity extends FragmentActivity implements
 
 	public void onOptionListSelected(int id) {
 		Intent intent;
-		
+
 		switch (id) {
 		case R.id.dropDownActiveList:
 			intent = new Intent(this, PlaceItsList.class);
@@ -529,8 +571,12 @@ public class MapActivity extends FragmentActivity implements
 			break;
 		case R.id.dropDownRecurringList:
 			intent = new Intent(this, PlaceItsList.class);
-			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY, PlaceIt.PLACE_IT_PROTOTYPE);
+			intent.putExtra(PlaceIt.PLACEIT_TYPE_KEY,
+					PlaceIt.PLACE_IT_PROTOTYPE);
 			startActivity(intent);
+			break;
+		case R.id.catPlaceIt:
+			getUIHandlers().showCatPlaceItCreationDialog();
 		}
 	}
 
