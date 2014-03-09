@@ -89,7 +89,7 @@ public class DistanceService extends Service {
 			@Override
 			public void run() {
 				new LocationRangeTask().execute(new Object[] {null});
-				handler.postDelayed(distanceNoti, 10000);
+				handler.postDelayed(distanceNoti, 60000);
 			}
 		};
 	}
