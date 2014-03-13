@@ -97,5 +97,15 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	public void clear() {
+		this.name = "";
+		this.password = "";
+		this.active = "";
+		this.pulled = "";
+		this.scheduled = "";
+		this.categorized = "";
+		
+	}
 
 }

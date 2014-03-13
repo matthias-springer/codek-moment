@@ -12,6 +12,7 @@ import edu.ucsd.cse110.team27.placeits.data.PlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype.RepeatMode;
 import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.User;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -577,6 +578,11 @@ public class MapActivity extends FragmentActivity implements
 			break;
 		case R.id.catPlaceIt:
 			getUIHandlers().showCatPlaceItCreationDialog();
+			break;
+		case R.id.action_logout:
+			User.getCurrentUser().clear();
+			intent = new Intent(this, LoginActivity.class);
+			startActivity(intent);
 		}
 	}
 

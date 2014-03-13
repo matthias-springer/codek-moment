@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<item android:id="@+id/action_options_list"
+          android:icon="@drawable/ic_action_settings"
+          android:showAsAction="ifRoom|withText"
+          android:title="Options" >
+          <menu>
+          	<item
+          		android:id="@+id/action_logout"
+          		android:title="Logout" />
+          	<item 
+          	    android:id="@+id/catPlaceIt"
+          	    android:title="Create Categorized Place-It" />
+          </menu>
+    </item>
+	
     <item android:id="@+id/action_placeit_list"
           android:icon="@drawable/ic_action_view_as_list"
           android:showAsAction="ifRoom|withText"
@@ -14,9 +29,6 @@
           	<item
           		android:id="@+id/dropDownRecurringList"
           		android:title="Recurring PlaceIts" />
-          	<item 
-          	    android:id="@+id/catPlaceIt"
-          	    android:title="Create Categorized Place-It" />
           </menu>
     </item>
 </menu>
