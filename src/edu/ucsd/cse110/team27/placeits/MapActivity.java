@@ -452,6 +452,9 @@ public class MapActivity extends FragmentActivity implements
 
 		RecurringPlaceIts.getInstance();
 		startService(new Intent(this, RecurringScheduler.class));
+		ActivePlaceIts.getInstance();
+		PulledDownPlaceIts.getInstance();
+		startService(new Intent(this, StoreService.class));
 	}
 
 	@Override
@@ -581,6 +584,7 @@ public class MapActivity extends FragmentActivity implements
 			break;
 		case R.id.action_logout:
 			User.getCurrentUser().clear();
+			getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", false).commit();
 			intent = new Intent(this, LoginActivity.class);
 			startActivity(intent);
 		}

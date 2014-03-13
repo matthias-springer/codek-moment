@@ -27,6 +27,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,6 +65,10 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getSharedPreferences(User.PREFS,0).getBoolean("loggedIn", false)) {
+			startActivity(new Intent(this, MapActivity.class));
+		}
 
 		setContentView(R.layout.activity_login);
 
@@ -292,6 +297,7 @@ public class LoginActivity extends Activity {
 					User.getCurrentUser().setScheduled(userData.get(2));
 					User.getCurrentUser().setCategorized(userData.get(3));
 				}
+				getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", true).commit();
 				Intent intent = new Intent(mContext, MapActivity.class);
 				startActivity(intent);
 			} else {
