@@ -12,6 +12,7 @@ import android.util.Log;
 
 import edu.ucsd.cse110.team27.placeits.MapActivity;
 import edu.ucsd.cse110.team27.placeits.PlaceItsChangeListener;
+import edu.ucsd.cse110.team27.placeits.StoreService;
 
 public abstract class PlaceIts<T extends PlaceIt> {
 
@@ -31,6 +32,23 @@ public abstract class PlaceIts<T extends PlaceIt> {
 
 	public int size() {
 		return placeIts.size();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadFromServer(String listStr) throws IOException {
+		if(listStr.isEmpty()) {
+			clear();
+			save();
+			return;
+		}
+				
+		String[] strPlaceits = listStr.split(StoreService.DELIM);
+		clear();
+		for(String placeIt : strPlaceits) {
+			if(!placeIt.isEmpty())
+				add((T) newInstance().load(placeIt));
+		}
+		save();
 	}
 
 	public void save() throws IOException {

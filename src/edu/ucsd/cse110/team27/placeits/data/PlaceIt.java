@@ -13,7 +13,7 @@ import edu.ucsd.cse110.team27.placeits.data.location.StaticLocationStrategy;
 
 public class PlaceIt {
 
-	protected static final String DELIM = "~◙;◙~";
+	protected static final String DELIM = "~;a4rty4;~";
 
 	private String title;
 

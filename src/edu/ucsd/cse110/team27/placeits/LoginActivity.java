@@ -19,6 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
+import edu.ucsd.cse110.team27.placeits.data.PlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.PulledDownPlaceIts;
+import edu.ucsd.cse110.team27.placeits.data.RecurringPlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.User;
 
 import android.animation.Animator;
@@ -44,7 +49,7 @@ import android.widget.Toast;
  * Activity which displays a login screen to the user, offering registration as
  * well.
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements PlaceItsChangeListener{
 
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
@@ -66,12 +71,8 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if(getSharedPreferences(User.PREFS,0).getBoolean("loggedIn", false)) {
-			startActivity(new Intent(this, MapActivity.class));
-		}
-
 		setContentView(R.layout.activity_login);
-
+		
 		// Set up the login form.
 		mUsernameView = (EditText) findViewById(R.id.username);
 		mUsernameView.setText(mUsername);
@@ -93,7 +94,16 @@ public class LoginActivity extends Activity {
 		mLoginFormView = findViewById(R.id.login_form);
 		mLoginStatusView = findViewById(R.id.login_status);
 		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
+		
+		PlaceIts.activity = this;
 
+		if(getSharedPreferences(User.PREFS,0).getBoolean("loggedIn", false)) {
+			mUsername = getSharedPreferences(User.PREFS, 0).getString("user","");
+			mPassword = getSharedPreferences(User.PREFS, 0).getString("password","");
+			new UserLoginTask(getApplicationContext()).execute((Void) null);
+			startActivity(new Intent(this, MapActivity.class));
+		}
+		
 		findViewById(R.id.sign_in_button).setOnClickListener(
 				new View.OnClickListener() {
 					@Override
@@ -203,6 +213,14 @@ public class LoginActivity extends Activity {
 			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
+	
+	public void addPlaceIt(PlaceIt placeIt) {}
+
+	public void removePlaceIt(PlaceIt placeIt) {}
+	
+	public Context getApplicationContext() {
+		return this;
+	}
 
 	/**
 	 * Represents an asynchronous login/registration task used to authenticate
@@ -298,6 +316,13 @@ public class LoginActivity extends Activity {
 					User.getCurrentUser().setCategorized(userData.get(3));
 				}
 				getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", true).commit();
+				getSharedPreferences(User.PREFS, 0).edit().putString("user", mUsername).commit();
+				getSharedPreferences(User.PREFS, 0).edit().putString("password", mPassword).commit();
+				try {
+					ActivePlaceIts.getInstance().loadFromServer(User.getCurrentUser().getActive());
+					PulledDownPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getPulled());
+					RecurringPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getScheduled());
+				} catch (IOException e) {}
 				Intent intent = new Intent(mContext, MapActivity.class);
 				startActivity(intent);
 			} else {

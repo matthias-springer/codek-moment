@@ -49,7 +49,7 @@ public class StoreService extends Service {
 	private Handler pushHandler = new Handler();
 	public static final String TAG = "StoreService";
 
-	protected static final String DELIM = "~�����;�����~";
+	public static final String DELIM = "~;89aj29348;~";
 
 	protected PlaceItLocationStrategy locationStrategy;
 

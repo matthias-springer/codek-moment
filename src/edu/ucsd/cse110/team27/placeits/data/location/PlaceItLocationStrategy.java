@@ -4,7 +4,7 @@ import android.location.Location;
 
 public abstract class PlaceItLocationStrategy {
 
-	static final String DELIM = "~☺;☺~";
+	static final String DELIM = "~;2390123kskasd53;~";
 	
 	public abstract String toFileString();
 	
