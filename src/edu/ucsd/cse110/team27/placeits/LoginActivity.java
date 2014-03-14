@@ -37,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -96,8 +97,7 @@ public class LoginActivity extends Activity implements PlaceItsChangeListener{
 		mLoginStatusMessageView = (TextView) findViewById(R.id.login_status_message);
 		
 		PlaceIts.activity = this;
-
-		if(getSharedPreferences(User.PREFS,0).getBoolean("loggedIn", false)) {
+		if(getSharedPreferences(User.PREFS,0).getBoolean("loggedIn", false)) {		
 			mUsername = getSharedPreferences(User.PREFS, 0).getString("user","");
 			mPassword = getSharedPreferences(User.PREFS, 0).getString("password","");
 			new UserLoginTask(getApplicationContext()).execute((Void) null);
@@ -168,9 +168,13 @@ public class LoginActivity extends Activity implements PlaceItsChangeListener{
 			// perform the user login attempt.
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
-			mAuthTask = new UserLoginTask(getApplicationContext());
+			mAuthTask = generateLoginTask();
 			mAuthTask.execute((Void) null);
 		}
+	}
+	
+	public UserLoginTask generateLoginTask() {
+		return new UserLoginTask(getApplicationContext());
 	}
 
 	/**
@@ -220,6 +224,20 @@ public class LoginActivity extends Activity implements PlaceItsChangeListener{
 	
 	public Context getApplicationContext() {
 		return this;
+	}
+	
+	public static void logout(Context context) {
+		User.getCurrentUser().clear();
+		context.getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", false).commit();
+		
+	}
+	
+	public void setmUsername(String uname) {
+		mUsername = uname;
+	}
+	
+	public void setmPassword(String pw) {
+		mPassword = pw;
 	}
 
 	/**
@@ -338,4 +356,5 @@ public class LoginActivity extends Activity implements PlaceItsChangeListener{
 			showProgress(false);
 		}
 	}
+	
 }

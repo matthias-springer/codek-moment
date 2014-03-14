@@ -583,8 +583,7 @@ public class MapActivity extends FragmentActivity implements
 			getUIHandlers().showCatPlaceItCreationDialog();
 			break;
 		case R.id.action_logout:
-			User.getCurrentUser().clear();
-			getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", false).commit();
+			LoginActivity.logout(getApplicationContext());
 			intent = new Intent(this, LoginActivity.class);
 			startActivity(intent);
 		}
