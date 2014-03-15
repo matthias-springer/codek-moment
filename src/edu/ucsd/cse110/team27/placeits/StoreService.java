@@ -27,12 +27,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+import edu.ucsd.cse110.team27.placeits.LoginActivity.UserLoginTask;
 import edu.ucsd.cse110.team27.placeits.data.ActivePlaceIts;
 import edu.ucsd.cse110.team27.placeits.data.PlaceIt;
 import edu.ucsd.cse110.team27.placeits.data.PlaceItPrototype;
@@ -44,9 +46,9 @@ import edu.ucsd.cse110.team27.placeits.data.location.PlaceItLocationStrategy;
 
 public class StoreService extends Service {
 
-	private Runnable post;
-	private Runnable pushRun;
-	private Handler pushHandler = new Handler();
+	public Runnable post;
+	public Runnable pushRun;
+	public Handler pushHandler = new Handler();
 	public static final String TAG = "StoreService";
 
 	public static final String DELIM = "~;89aj29348;~";
@@ -75,7 +77,7 @@ public class StoreService extends Service {
 	private String PLIST; 
 	private String SLIST; 
 	private String CLIST;
-	
+
 	private String ourA;
 	private String ourP;
 	private String ourS;
@@ -89,16 +91,18 @@ public class StoreService extends Service {
 	protected URI[] url;
 	private String[] inters;
 
+	boolean serverConnection = false;
+
 
 	public void onCreate(){		
 		pushRun = new Runnable(){			
 			@Override
 			public void run(){
-				
-//				ActivePlaceIts.getInstance().clear(); checking if clear works prior it worked. 
-//				PulledDownPlaceIts.getInstance().clear();
-//				RecurringPlaceIts.getInstance().clear();
-//				ActivePlaceIts.getInstance().clear();
+
+				//				ActivePlaceIts.getInstance().clear(); checking if clear works prior it worked. 
+				//				PulledDownPlaceIts.getInstance().clear();
+				//				RecurringPlaceIts.getInstance().clear();
+				//				ActivePlaceIts.getInstance().clear();
 
 
 				activeList = ActivePlaceIts.getInstance().getList();
@@ -113,10 +117,9 @@ public class StoreService extends Service {
 
 				// transform all my lists to String representation. 
 
-				new getListTask().execute(User.DatastoreURI);
-				
-				
-				
+//				new getListTask(null).execute(User.DatastoreURI);
+				new getListTask(getApplicationContext()).execute();
+
 
 				pushHandler.postDelayed(pushRun, 10000); // run every 10 sec
 			}
@@ -129,6 +132,7 @@ public class StoreService extends Service {
 		pushRun.run();
 	}
 
+
 	// turns the List<PlaceIt> to string representation.
 	public String stringPlaceits(List<PlaceIt> list){
 
@@ -139,7 +143,7 @@ public class StoreService extends Service {
 		return pstring; 
 	}
 
-	
+
 	public String stringProPlaceits(List<PlaceItPrototype> list){
 
 		String lstring = "";
@@ -149,77 +153,26 @@ public class StoreService extends Service {
 		return lstring;
 	}
 
-/*
-	// this converts and returns type List<PlaceIt> of server String representation of list. 
-	public List<PlaceIt> load(String line) {
 
-		PlaceIt place = new PlaceIt();
-		List<PlaceIt> serverList = new ArrayList<PlaceIt>();
-
-		while (line != null) {
-			String[] partition = line.split(DELIM);
-			for(int i = 0; i < partition.length; i++){
-				place = (PlaceIt) place.load(partition[i]);
-				serverList.add(place);
-			}
-		}
-		return serverList; 
+	public Context getApplicationContext() {
+		return this;
 	}
-
-	public List<PlaceItPrototype> loadpro(String line){
-		List<PlaceItPrototype> list = new ArrayList<PlaceItPrototype>();
-		PlaceItPrototype place = new PlaceItPrototype();
-
-		while (line != null) {
-			String[] partition = line.split(DELIM);
-			for(int i = 0; i < partition.length; i++){
-				place =  (PlaceItPrototype) place.load(partition[i]);
-				list.add(place);
-			}
-		}
-
-		return list;
+	
+	public getListTask generateListTask() {
+		return new getListTask(getApplicationContext());
 	}
-
-	// take the active and pulled string from server and part it to string array
-	public String[] stringToArray(String list){
-		String[] partition = {};
-
-		while (list != null) {
-			partition = list.split(DELIM);
-		}
-		return partition;
-	}
-
-	// take the current list and create string array
-	public String[] objectToArray(List<PlaceIt> list){
-		String[] partition1 = {};
-
-		while (list != null) {
-			for(int i = 0; i < list.size(); i++){
-				partition1[i] = list.get(i).toFileString();
-			}
-		}	
-		return partition1;
-	}
-
-	// take the recurring place it from server and part it to string array. 
-	public String[] ProtoToArray(List<PlaceItPrototype> list){
-		String[] partition1 = {};
-
-		while (list != null) {
-			for(int i = 0; i < list.size(); i++){
-				partition1[i] = list.get(i).toFileString();
-			}
-		}	
-		return partition1;
-	}
-	*/
-
 
 	//compare the unique ids before posting
-	private class getListTask extends AsyncTask<String, Void, List<String>>{
+	public class getListTask extends AsyncTask<String, Void, List<String>>{
+		private Context mContext;
 
+		private List<String> userData = new ArrayList<String>();
+
+		public getListTask(Context context) {
+			mContext = context;
+			userData.clear();
+		}
+		
 		@Override
 		protected List<String> doInBackground(String... url) {
 			// TODO Auto-generated method stub
@@ -237,6 +190,9 @@ public class StoreService extends Service {
 				String data = EntityUtils.toString(entity);
 				Log.d(TAG, data);
 				JSONObject myjson;
+
+				serverConnection = true;
+
 				try{
 					myjson = new JSONObject(data);
 					JSONArray array = myjson.getJSONArray("data");
@@ -299,61 +255,31 @@ public class StoreService extends Service {
 	}
 
 
+
 	protected void onPostExecute(List<String> listofList) {
 
 		//		activeList = ActivePlaceIts.getInstance().getList();
 		//		pulledList = ActivePlaceIts.getInstance().getList();
 		//		recurringList = ActivePlaceIts.getInstance().getList();
 		//		categoryList = ActivePlaceIts.getInstance().getList();
-		
+
 		// all we have to do is set the parameter(servers list) to our current list.
-		while(listofList != null){
-			
-			// these hold the string of the lists
-			ourA = listofList.get(0); // string of active list
-			ourP = listofList.get(1); // string of pulled
-			ourS = listofList.get(2); // string of scheduled
-			ourC = listofList.get(3); // dont need this we dont have a list of categories.
-			
-			
-			// clear the current list
-			ActivePlaceIts.getInstance().clear();
-			PulledDownPlaceIts.getInstance().clear();
-			RecurringPlaceIts.getInstance().clear();
-			ActivePlaceIts.getInstance().clear();
-			
-			
-			
-			// new instance of our current list
-//			NactiveList = ActivePlaceIts.getInstance().getList();
-//			NpulledList = PulledDownPlaceIts.getInstance().getList();
-//			NrecurringList = RecurringPlaceIts.getInstance().getList();
-//			NcategoryList = ActivePlaceIts.getInstance().getList();
-//
-//			String[] aLIST = stringToArray(listofList.get(0));
-//			String[] pLIST = stringToArray(listofList.get(1));
-//			String[] sLIST = stringToArray(listofList.get(2));
-//			String[] cLIST = stringToArray(listofList.get(3));
-//
-//			String[] currentAlist = objectToArray(NactiveList);
-//			String[] currentPlist = objectToArray(NpulledList);
-//			String[] currentSlist = ProtoToArray(NrecurringList);
-//			String[] currentClist = objectToArray(NcategoryList);
-//
-//			ALIST = compareList(aLIST, currentAlist); // returns a string
-//			PLIST = compareList(pLIST, currentPlist);
-//			SLIST = compareList(sLIST, currentSlist);
-//			CLIST = compareList(cLIST, currentClist);
-			
-			// now set the String up there to our current instance and done. 
-//			ActivePlaceIts.getInstance(null).save(ourA);
-//			PulledDownPlaceIts.getInstance(null).save(ourP);
-//			RecurringPlaceIts.getInstance(null).save(ourS);
-//			ActivePlaceIts.getInstance(null).save(ourC);
-//			
-		}
+		
+		ourA = listofList.get(0); // string of active list
+		ourP = listofList.get(1); // string of pulled
+		ourS = listofList.get(2); // string of scheduled
+		ourC = listofList.get(3);
+		
+		try {
+			ActivePlaceIts.getInstance().loadFromServer(ourA);
+			PulledDownPlaceIts.getInstance().loadFromServer(ourP);
+			RecurringPlaceIts.getInstance().loadFromServer(ourS);
+		} catch (IOException e) {}
 
 	}
+
+
+
 
 	// should return union between 2 lists 
 	protected String compareList(String[] serverList, String[] myList){
