@@ -95,6 +95,7 @@ PlaceItsChangeListener {
 	}
 
 	public void onDestroy(){
+		super.onDestroy();
 		stopService(new Intent(getApplicationContext(), StoreService.class));
 	}
 

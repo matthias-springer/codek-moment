@@ -72,12 +72,6 @@ public class StoreService extends Service {
 	private List<PlaceItPrototype> NrecurringList;
 	private List<PlaceIt> NcategoryList;
 
-	// check it the list was updated. 
-	//				NactiveList = ActivePlaceIts.getInstance().getList();
-	//				NpulledList = PulledDownPlaceIts.getInstance().getList();
-	//				NrecurringList = RecurringPlaceIts.getInstance().getList();
-	//				NcategoryList = ActivePlaceIts.getInstance().getList();
-
 	private String ALIST; 
 	private String PLIST; 
 	private String SLIST; 
@@ -121,7 +115,7 @@ public class StoreService extends Service {
 				// transform all my lists to String representation. 
 
 				//				new getListTask(null).execute(User.DatastoreURI);
-				new getListTask().execute();
+				new getListTask().execute(User.DatastoreURI);
 
 				Log.d("service", "handler");
 				pushHandler.postDelayed(pushRun, 15000); // run every 10 sec
@@ -166,7 +160,7 @@ public class StoreService extends Service {
 
 		private List<String> userData = new ArrayList<String>();
 
-	
+
 		
 
 		@Override
@@ -216,32 +210,8 @@ public class StoreService extends Service {
 
 			}
 
-//			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(User.DatastoreURI);
-			try{
-				
-				Log.d("post to server ", "Store servic");
-
-				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-				nameValuePairs.add(new BasicNameValuePair("user", user.getName()));
-				nameValuePairs.add(new BasicNameValuePair("active", ALIST));
-				nameValuePairs.add(new BasicNameValuePair("scheduled", SLIST));
-				nameValuePairs.add(new BasicNameValuePair("categorized", CLIST));
-				nameValuePairs.add(new BasicNameValuePair("pulled", PLIST));
-				nameValuePairs.add(new BasicNameValuePair("password", user.getPassword()));
-
-				nameValuePairs.add(new BasicNameValuePair("action","put"));
-
-				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-				HttpResponse response = client.execute(post);
-
-			}
-			catch(IOException e){
-
-				Log.d(TAG, "IOException while trying to post place it Lists");
-			}
+//			
+			postList();
 
 			return userData;
 		}	
@@ -281,6 +251,50 @@ public class StoreService extends Service {
 
 			
 		}
+	}
+
+	public void postList(){
+		HttpClient client = new DefaultHttpClient();
+		HttpPost post = new HttpPost(User.DatastoreURI);
+		User user = User.getCurrentUser();
+		try{
+			
+			Log.d("post to server ", "Store servic");
+
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+			nameValuePairs.add(new BasicNameValuePair("user", user.getName()));
+			nameValuePairs.add(new BasicNameValuePair("active", ALIST));
+			nameValuePairs.add(new BasicNameValuePair("scheduled", SLIST));
+			nameValuePairs.add(new BasicNameValuePair("categorized", CLIST));
+			nameValuePairs.add(new BasicNameValuePair("pulled", PLIST));
+			nameValuePairs.add(new BasicNameValuePair("password", user.getPassword()));
+
+			nameValuePairs.add(new BasicNameValuePair("action","put"));
+
+			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+			HttpResponse response = client.execute(post);
+
+		}
+		catch(IOException e){
+
+			Log.d(TAG, "IOException while trying to post place it Lists");
+		}
+	}
+
+
+	// for method 2
+	public void reload() {
+
+		Intent intent = new Intent(getApplicationContext(), MapActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		map.overridePendingTransition(0, 0);
+
+		map.finish();
+
+		map.overridePendingTransition(0, 0);
+		startActivity(intent);
 	}
 
 

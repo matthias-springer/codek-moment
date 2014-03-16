@@ -44,10 +44,10 @@ public class PlaceItPrototype extends PlaceIt {
 		super.load(line);
 
 		String[] placeitData = line.split(DELIM);
-		this.week = Integer.parseInt(placeitData[4]);
-		this.dayOfWeek = Integer.parseInt(placeitData[5]);
-		this.minutes = Integer.parseInt(placeitData[6]);
-		this.repeatMode = RepeatMode.values()[Integer.parseInt(placeitData[7])];
+		this.week = Integer.parseInt(placeitData[3]);
+		this.dayOfWeek = Integer.parseInt(placeitData[4]);
+		this.minutes = Integer.parseInt(placeitData[5]);
+		this.repeatMode = RepeatMode.values()[Integer.parseInt(placeitData[6])];
 		updateNextScheduledTime();
 
 		return this;
