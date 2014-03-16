@@ -201,13 +201,13 @@ public class StoreService extends Service {
 					}
 				}
 				catch (JSONException e) {
-
+					e.printStackTrace();
 				}
 
 			} catch (ClientProtocolException e) {
-
+				e.printStackTrace();
 			} catch (IOException e) {
-
+				e.printStackTrace();
 			}
 
 //			
@@ -218,6 +218,9 @@ public class StoreService extends Service {
 		
 		
 		protected void onPostExecute(List<String> listofList) {
+			
+			if(listofList.isEmpty())
+				return;
 
 			Log.d("post", "EXECUTE");
 			//		activeList = ActivePlaceIts.getInstance().getList();
