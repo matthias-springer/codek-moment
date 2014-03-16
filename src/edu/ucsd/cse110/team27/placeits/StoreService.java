@@ -26,6 +26,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -90,6 +92,9 @@ public class StoreService extends Service {
 	private String[] updates;
 	protected URI[] url;
 	private String[] inters;
+	
+	MapActivity.UIHandlers mapui;
+	MapActivity map;
 
 	boolean serverConnection = false;
 
@@ -125,6 +130,8 @@ public class StoreService extends Service {
 			}
 		};
 	}
+	
+
 
 	@Override
 	public void onStart(Intent intent, int startid) {
@@ -264,21 +271,65 @@ public class StoreService extends Service {
 		//		categoryList = ActivePlaceIts.getInstance().getList();
 
 		// all we have to do is set the parameter(servers list) to our current list.
-		
 		ourA = listofList.get(0); // string of active list
 		ourP = listofList.get(1); // string of pulled
 		ourS = listofList.get(2); // string of scheduled
 		ourC = listofList.get(3);
 		
+		if(!listofList.isEmpty()) {
+			
+			User.getCurrentUser().setActive(listofList.get(0));
+			User.getCurrentUser().setPulled(listofList.get(1));
+			User.getCurrentUser().setScheduled(listofList.get(2));
+			User.getCurrentUser().setCategorized(listofList.get(3));
+			
+			
+		}
+		getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", true).commit();
+		getSharedPreferences(User.PREFS, 0).edit().putString("user", user.getName()).commit();
+		getSharedPreferences(User.PREFS, 0).edit().putString("password", user.getPassword()).commit();
 		try {
-			ActivePlaceIts.getInstance().loadFromServer(ourA);
-			PulledDownPlaceIts.getInstance().loadFromServer(ourP);
-			RecurringPlaceIts.getInstance().loadFromServer(ourS);
+			ActivePlaceIts.getInstance().loadFromServer(User.getCurrentUser().getActive());
+			PulledDownPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getPulled());
+			RecurringPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getScheduled());
 		} catch (IOException e) {}
+		
+		// method 1
+		map.recreate();
+		
+		mapui.setUpCallbacks();
+		// method 2
+		reload();
+		
+		// method 3
+		new Handler().post(new Runnable() {
+
+	         @Override
+	         public void run()
+	         {
+	            Intent intent = map.getIntent();
+	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+	            map.overridePendingTransition(0, 0);
+	            map.finish();
+
+	            map.overridePendingTransition(0, 0);
+	            startActivity(intent);
+	        }
+	    });
+	}
+	
+	// for method 2
+	public void reload() {
+
+		Intent intent = new Intent(getApplicationContext(), MapActivity.class);
+	    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+	    map.finish();
+
+	    map.overridePendingTransition(0, 0);
+	    startActivity(intent);
+	    map.overridePendingTransition(0, 0);
 
 	}
-
-
 
 
 	// should return union between 2 lists 
@@ -339,7 +390,14 @@ public class StoreService extends Service {
 		return intersect;
 	}
 
-
+	public void onDestroy(){
+		super.onDestroy();
+		
+	}
+	
+	public void onPause(){
+		stopService(new Intent(this, StoreService.class));
+	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
