@@ -66,14 +66,17 @@ import android.content.Context;
 import android.content.Intent;
 
 public class MapActivity extends FragmentActivity implements
-		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
-		PlaceItsChangeListener {
+ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
+PlaceItsChangeListener {
 
 	private GoogleMap mMap;
 
 	private LocationClient mLocationClient;
 
 	private UIHandlers uiHandlers;
+	
+	boolean firstStart = true;
+
 
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(1000) // 1s
@@ -120,6 +123,24 @@ public class MapActivity extends FragmentActivity implements
 		private final Button debugClear;
 
 		private LatLng lastLocation;
+
+
+
+		public void reload() {
+
+			Intent intent = getIntent(); // new Intent(getApplicationContext(), MapActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+			finish();
+
+			overridePendingTransition(0, 0);
+			startActivity(intent);
+			overridePendingTransition(0, 0);
+
+		}
+
+		public void onDestroy(){
+			stopService(new Intent(getApplicationContext(), StoreService.class));
+		}
 
 		public UIHandlers() {
 			placeItTitle = (EditText) findViewById(R.id.placeItTitle);
@@ -173,31 +194,31 @@ public class MapActivity extends FragmentActivity implements
 
 		private void setUpRepeatingBox() {
 			checkRepeating
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-							onCheckRepeatingCheckChanged(isChecked);
-						}
-					});
+			.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView,
+						boolean isChecked) {
+					onCheckRepeatingCheckChanged(isChecked);
+				}
+			});
 
 			optionRepeatDayWeek
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-							onOptionRepeatDayWeekCheckChanged(isChecked);
-						}
-					});
+			.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView,
+						boolean isChecked) {
+					onOptionRepeatDayWeekCheckChanged(isChecked);
+				}
+			});
 
 			optionRepeatMinutes
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-							onOptionRepeatMinutesCheckChanged(isChecked);
-						}
-					});
+			.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView,
+						boolean isChecked) {
+					onOptionRepeatMinutesCheckChanged(isChecked);
+				}
+			});
 
 			debugClear.setOnClickListener(new OnClickListener() {
 				@Override
@@ -231,9 +252,9 @@ public class MapActivity extends FragmentActivity implements
 			} else {
 				placeIt = new PlaceIt(placeItTitle.getText().toString(),
 						placeItDescription.getText().toString(), cat1
-								.getSelectedItem().toString(), cat2
-								.getSelectedItem().toString(), cat3
-								.getSelectedItem().toString());
+						.getSelectedItem().toString(), cat2
+						.getSelectedItem().toString(), cat3
+						.getSelectedItem().toString());
 			}
 
 			ActivePlaceIts.getInstance().add(placeIt);
@@ -426,6 +447,9 @@ public class MapActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map_activity);
 
+
+
+
 	}
 
 	private void loadPlaceIts() {
@@ -454,7 +478,9 @@ public class MapActivity extends FragmentActivity implements
 		startService(new Intent(this, RecurringScheduler.class));
 		ActivePlaceIts.getInstance();
 		PulledDownPlaceIts.getInstance();
+		
 		startService(new Intent(this, StoreService.class));
+		
 	}
 
 	@Override
@@ -474,6 +500,9 @@ public class MapActivity extends FragmentActivity implements
 		if (mLocationClient != null) {
 			mLocationClient.disconnect();
 		}
+		
+		stopService(new Intent(this, StoreService.class));
+
 	}
 
 	private void setUpLocationClientIfNeeded() {
@@ -525,13 +554,13 @@ public class MapActivity extends FragmentActivity implements
 		if (!placeIt.isCategorizedPlaceIt()) {
 			try {
 				Marker marker = mMap.addMarker(new MarkerOptions()
-						.title(placeIt.getTitle())
-						.position(placeIt.getLatLng())
-						.snippet(placeIt.getDescription())
-						.icon(BitmapDescriptorFactory
-								.fromResource(getResources().getIdentifier(
-										"posticon", "drawable",
-										getPackageName()))));
+				.title(placeIt.getTitle())
+				.position(placeIt.getLatLng())
+				.snippet(placeIt.getDescription())
+				.icon(BitmapDescriptorFactory
+						.fromResource(getResources().getIdentifier(
+								"posticon", "drawable",
+								getPackageName()))));
 
 				placeIt.setMarker(marker);
 			} catch (Exception exc) {
