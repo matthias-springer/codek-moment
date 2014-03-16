@@ -227,6 +227,7 @@ public class LoginActivity extends Activity implements PlaceItsChangeListener{
 	}
 	
 	public static void logout(Context context) {
+		
 		User.getCurrentUser().clear();
 		context.getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", false).commit();	
 		try {

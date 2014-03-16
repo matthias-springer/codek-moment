@@ -46,30 +46,37 @@ public class DistanceService extends Service {
 
 	class LocationRangeTask extends AsyncTask<Object, Integer, List<PlaceIt>> {
 
+
 		@Override
 		protected List<PlaceIt> doInBackground(Object... arg0) {
+
+
 			List<PlaceIt> notifiedPlaceIts = new ArrayList<PlaceIt>();
+			try{
+				// got the inner list call items with .get(int x) method.
+				activeList = ActivePlaceIts.getInstance().getList();
 
-			// got the inner list call items with .get(int x) method.
-			activeList = ActivePlaceIts.getInstance().getList();
+				for (int i = 0; i < activeList.size(); i++) {
+					// Location of place it
 
-			for (int i = 0; i < activeList.size(); i++) {
-				// Location of place it
+					// convert the LatLng location of the place it and the user
+					// location to Location
+					placeItLoc = activeList.get(i).getLocation();
+					locationLng = getCurrentPosition();
+					locationLoc = convertLatLoc(locationLng);
 
-				// convert the LatLng location of the place it and the user
-				// location to Location
-				placeItLoc = activeList.get(i).getLocation();
-				locationLng = getCurrentPosition();
-				locationLoc = convertLatLoc(locationLng);
-
-				// dont know how to set half mile to float.
-				if (activeList.get(i).isWithinDistance(locationLoc, halfmile)
-						&& (!activeList.get(i).getPrint())) {
-					notifiedPlaceIts.add(activeList.get(i));
+					// dont know how to set half mile to float.
+					if (activeList.get(i).isWithinDistance(locationLoc, halfmile)
+							&& (!activeList.get(i).getPrint())) {
+						notifiedPlaceIts.add(activeList.get(i));
+					}
 				}
 			}
+			catch(Exception e){}
+
 
 			return notifiedPlaceIts;
+
 		}
 
 		@Override
@@ -115,7 +122,7 @@ public class DistanceService extends Service {
 	private LatLng getCurrentPosition() {
 		LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		Criteria criteria = new Criteria(); // set criteria for location
-											// provider:
+		// provider:
 		criteria.setAccuracy(Criteria.ACCURACY_FINE); // fine accuracy
 		criteria.setCostAllowed(false); // no monetary cost
 
@@ -143,9 +150,9 @@ public class DistanceService extends Service {
 				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		object.setPrint(true);
 		NotificationCompat.Builder note = new NotificationCompat.Builder(this)
-				.setSmallIcon(R.drawable.alert_dark_frame)
-				.setContentTitle(title).setContentText(text)
-				.setSound(noteSound).setAutoCancel(true);
+		.setSmallIcon(R.drawable.alert_dark_frame)
+		.setContentTitle(title).setContentText(text)
+		.setSound(noteSound).setAutoCancel(true);
 
 		int seed = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
 		Random r = new Random(seed);

@@ -2,6 +2,7 @@ package edu.ucsd.cse110.team27.placeits;
 
 import java.io.BufferedReader;
 
+import android.util.Log;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -26,6 +27,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.google.android.gms.maps.MapView;
 
 import android.app.Activity;
 import android.app.Service;
@@ -92,7 +95,7 @@ public class StoreService extends Service {
 	private String[] updates;
 	protected URI[] url;
 	private String[] inters;
-	
+
 	MapActivity.UIHandlers mapui;
 	MapActivity map;
 
@@ -103,11 +106,6 @@ public class StoreService extends Service {
 		pushRun = new Runnable(){			
 			@Override
 			public void run(){
-
-				//				ActivePlaceIts.getInstance().clear(); checking if clear works prior it worked. 
-				//				PulledDownPlaceIts.getInstance().clear();
-				//				RecurringPlaceIts.getInstance().clear();
-				//				ActivePlaceIts.getInstance().clear();
 
 
 				activeList = ActivePlaceIts.getInstance().getList();
@@ -122,15 +120,15 @@ public class StoreService extends Service {
 
 				// transform all my lists to String representation. 
 
-//				new getListTask(null).execute(User.DatastoreURI);
-				new getListTask(getApplicationContext()).execute();
+				//				new getListTask(null).execute(User.DatastoreURI);
+				new getListTask().execute();
 
-
-				pushHandler.postDelayed(pushRun, 10000); // run every 10 sec
+				Log.d("service", "handler");
+				pushHandler.postDelayed(pushRun, 15000); // run every 10 sec
 			}
 		};
 	}
-	
+
 
 
 	@Override
@@ -160,14 +158,7 @@ public class StoreService extends Service {
 		return lstring;
 	}
 
-
-	public Context getApplicationContext() {
-		return this;
-	}
 	
-	public getListTask generateListTask() {
-		return new getListTask(getApplicationContext());
-	}
 
 	//compare the unique ids before posting
 	public class getListTask extends AsyncTask<String, Void, List<String>>{
@@ -175,14 +166,16 @@ public class StoreService extends Service {
 
 		private List<String> userData = new ArrayList<String>();
 
-		public getListTask(Context context) {
-			mContext = context;
-			userData.clear();
-		}
+	
 		
+
 		@Override
 		protected List<String> doInBackground(String... url) {
 			// TODO Auto-generated method stub
+			
+//			postList();
+			
+			Log.d("doin background", " StoreService");
 
 			HttpClient client = new DefaultHttpClient();
 			HttpGet request = new HttpGet(User.DatastoreURI);
@@ -223,113 +216,75 @@ public class StoreService extends Service {
 
 			}
 
-			postList();
+//			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(User.DatastoreURI);
+			try{
+				
+				Log.d("post to server ", "Store servic");
+
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+				nameValuePairs.add(new BasicNameValuePair("user", user.getName()));
+				nameValuePairs.add(new BasicNameValuePair("active", ALIST));
+				nameValuePairs.add(new BasicNameValuePair("scheduled", SLIST));
+				nameValuePairs.add(new BasicNameValuePair("categorized", CLIST));
+				nameValuePairs.add(new BasicNameValuePair("pulled", PLIST));
+				nameValuePairs.add(new BasicNameValuePair("password", user.getPassword()));
+
+				nameValuePairs.add(new BasicNameValuePair("action","put"));
+
+				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+				HttpResponse response = client.execute(post);
+
+			}
+			catch(IOException e){
+
+				Log.d(TAG, "IOException while trying to post place it Lists");
+			}
 
 			return userData;
 		}	
-	}
-
-
-	private void postList(){
-
-
-		HttpClient client = new DefaultHttpClient();
-		HttpPut post = new HttpPut(User.DatastoreURI);
-		User user = User.getCurrentUser();
-		try{
-
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
-			nameValuePairs.add(new BasicNameValuePair("user", user.getName()));
-			nameValuePairs.add(new BasicNameValuePair("active", ALIST));
-			nameValuePairs.add(new BasicNameValuePair("scheduled", SLIST));
-			nameValuePairs.add(new BasicNameValuePair("categorized", CLIST));
-			nameValuePairs.add(new BasicNameValuePair("pulled", PLIST));
-			nameValuePairs.add(new BasicNameValuePair("password", user.getPassword()));
-
-			nameValuePairs.add(new BasicNameValuePair("action","put"));
-
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-			HttpResponse response = client.execute(post);
-
-		}
-		catch(IOException e){
-
-			Log.d(TAG, "IOException while trying to post place it Lists");
-		}
-
-	}
-
-
-
-	protected void onPostExecute(List<String> listofList) {
-
-		//		activeList = ActivePlaceIts.getInstance().getList();
-		//		pulledList = ActivePlaceIts.getInstance().getList();
-		//		recurringList = ActivePlaceIts.getInstance().getList();
-		//		categoryList = ActivePlaceIts.getInstance().getList();
-
-		// all we have to do is set the parameter(servers list) to our current list.
-		ourA = listofList.get(0); // string of active list
-		ourP = listofList.get(1); // string of pulled
-		ourS = listofList.get(2); // string of scheduled
-		ourC = listofList.get(3);
 		
-		if(!listofList.isEmpty()) {
-			
+		
+		protected void onPostExecute(List<String> listofList) {
+
+			Log.d("post", "EXECUTE");
+			//		activeList = ActivePlaceIts.getInstance().getList();
+			//		pulledList = ActivePlaceIts.getInstance().getList();
+			//		recurringList = ActivePlaceIts.getInstance().getList();
+			//		categoryList = ActivePlaceIts.getInstance().getList();
+
+			// all we have to do is set the parameter(servers list) to our current list.
+			ourA = listofList.get(0); // string of active list
+			ourP = listofList.get(1); // string of pulled
+			ourS = listofList.get(2); // string of scheduled
+			ourC = listofList.get(3);
+
+
 			User.getCurrentUser().setActive(listofList.get(0));
 			User.getCurrentUser().setPulled(listofList.get(1));
 			User.getCurrentUser().setScheduled(listofList.get(2));
 			User.getCurrentUser().setCategorized(listofList.get(3));
-			
+
+
+			try {
+				
+				Log.d("loadfromserver", "in the postexecute");
+				ActivePlaceIts.getInstance().loadFromServer(User.getCurrentUser().getActive());
+				PulledDownPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getPulled());
+				RecurringPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getScheduled());
+			} catch (IOException e) {
+				
+				Log.d("postExecute", "while trying to create new list");
+			}
+
 			
 		}
-		getSharedPreferences(User.PREFS, 0).edit().putBoolean("loggedIn", true).commit();
-		getSharedPreferences(User.PREFS, 0).edit().putString("user", user.getName()).commit();
-		getSharedPreferences(User.PREFS, 0).edit().putString("password", user.getPassword()).commit();
-		try {
-			ActivePlaceIts.getInstance().loadFromServer(User.getCurrentUser().getActive());
-			PulledDownPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getPulled());
-			RecurringPlaceIts.getInstance().loadFromServer(User.getCurrentUser().getScheduled());
-		} catch (IOException e) {}
-		
-		// method 1
-		map.recreate();
-		
-		mapui.setUpCallbacks();
-		// method 2
-		reload();
-		
-		// method 3
-		new Handler().post(new Runnable() {
-
-	         @Override
-	         public void run()
-	         {
-	            Intent intent = map.getIntent();
-	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-	            map.overridePendingTransition(0, 0);
-	            map.finish();
-
-	            map.overridePendingTransition(0, 0);
-	            startActivity(intent);
-	        }
-	    });
 	}
-	
-	// for method 2
-	public void reload() {
 
-		Intent intent = new Intent(getApplicationContext(), MapActivity.class);
-	    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-	    map.finish();
 
-	    map.overridePendingTransition(0, 0);
-	    startActivity(intent);
-	    map.overridePendingTransition(0, 0);
 
-	}
 
 
 	// should return union between 2 lists 
@@ -392,9 +347,9 @@ public class StoreService extends Service {
 
 	public void onDestroy(){
 		super.onDestroy();
-		
+
 	}
-	
+
 	public void onPause(){
 		stopService(new Intent(this, StoreService.class));
 	}

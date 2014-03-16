@@ -74,7 +74,7 @@ PlaceItsChangeListener {
 	private LocationClient mLocationClient;
 
 	private UIHandlers uiHandlers;
-	
+
 	boolean firstStart = true;
 
 
@@ -93,6 +93,12 @@ PlaceItsChangeListener {
 
 		return uiHandlers;
 	}
+
+	public void onDestroy(){
+		stopService(new Intent(getApplicationContext(), StoreService.class));
+	}
+
+
 
 	/**
 	 * This class handles all UI event stuff. Contains callbacks and references
@@ -124,23 +130,6 @@ PlaceItsChangeListener {
 
 		private LatLng lastLocation;
 
-
-
-		public void reload() {
-
-			Intent intent = getIntent(); // new Intent(getApplicationContext(), MapActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-			finish();
-
-			overridePendingTransition(0, 0);
-			startActivity(intent);
-			overridePendingTransition(0, 0);
-
-		}
-
-		public void onDestroy(){
-			stopService(new Intent(getApplicationContext(), StoreService.class));
-		}
 
 		public UIHandlers() {
 			placeItTitle = (EditText) findViewById(R.id.placeItTitle);
@@ -478,10 +467,12 @@ PlaceItsChangeListener {
 		startService(new Intent(this, RecurringScheduler.class));
 		ActivePlaceIts.getInstance();
 		PulledDownPlaceIts.getInstance();
-		
+
 		startService(new Intent(this, StoreService.class));
-		
+
 	}
+	
+
 
 	@Override
 	public void onPause() {
@@ -500,7 +491,7 @@ PlaceItsChangeListener {
 		if (mLocationClient != null) {
 			mLocationClient.disconnect();
 		}
-		
+
 		stopService(new Intent(this, StoreService.class));
 
 	}
@@ -612,8 +603,10 @@ PlaceItsChangeListener {
 			getUIHandlers().showCatPlaceItCreationDialog();
 			break;
 		case R.id.action_logout:
+			stopService(new Intent(this, StoreService.class));
 			LoginActivity.logout(getApplicationContext());
 			intent = new Intent(this, LoginActivity.class);
+			
 			startActivity(intent);
 		}
 	}

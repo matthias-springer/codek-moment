@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.team27.placeits.data;
 
 import java.io.BufferedReader;
+import android.util.Log;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -36,6 +37,9 @@ public abstract class PlaceIts<T extends PlaceIt> {
 	
 	@SuppressWarnings("unchecked")
 	public void loadFromServer(String listStr) throws IOException {
+		
+		Log.d("loadfromServer", "load");
+		
 		if(listStr.isEmpty()) {
 			clear();
 			save();

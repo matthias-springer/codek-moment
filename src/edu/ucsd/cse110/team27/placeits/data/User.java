@@ -4,7 +4,9 @@ public class User {
 	
 	private static User instance;
 	
-	public static final String DatastoreURI = "http://team27placeits.appspot.com/user";
+	public static final String DatastoreURI2 = "http://team27placeits.appspot.com/user";
+	public static final String DatastoreURI = "http://team27placeits2.appspot.com/user";
+
 	public static final String PREFS = "team27.placeits.prefs";
 	
 	private String name;
